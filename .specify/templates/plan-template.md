@@ -31,7 +31,24 @@
 
 *GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
 
-[Gates determined based on constitution file]
+Verify compliance with `.specify/memory/constitution.md` principles:
+
+- [ ] **I. API-First Architecture**: Backend/Frontend separation clear? API versioning planned?
+- [ ] **II. Security & Data Protection**: Authentication/authorization strategy defined? Input validation planned? Data encryption for sensitive info?
+- [ ] **III. Test-First Development**: Acceptance criteria testable? Test-first workflow confirmed?
+- [ ] **IV. Accessibility Standards**: WCAG 2.1 AA compliance planned? Keyboard navigation & screen readers considered?
+- [ ] **V. Performance & Scalability**: Response time targets defined? Caching/pagination strategy for large data?
+- [ ] **VI. Modular Feature Design**: Clear feature boundaries? Independent deployment possible?
+- [ ] **VII. Documentation & User Experience**: API documentation planned? User help/error messages designed?
+
+**Technology Stack Compliance**:
+- [ ] Laravel 11.x + PHP 8.2+ (backend)
+- [ ] Vue.js 3.x + TypeScript (frontend)
+- [ ] MySQL 8.0+/PostgreSQL 14+ (database)
+- [ ] Redis 7.x (caching)
+- [ ] PHPUnit + Vitest/Jest (testing)
+
+**Violations Requiring Justification**: [List any principle violations with rationale or state "None"]
 
 ## Project Structure
 

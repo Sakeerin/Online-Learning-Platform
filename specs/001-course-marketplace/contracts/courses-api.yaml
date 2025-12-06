@@ -1,0 +1,947 @@
+openapi: 3.0.3
+info:
+  title: Course Management API
+  description: API endpoints for instructors to create, manage, and publish courses
+  version: 1.0.0
+  contact:
+    name: API Support
+    email: api@learningplatform.com
+
+servers:
+  - url: http://localhost:8000/api/v1
+    description: Local development
+  - url: https://api.learningplatform.com/v1
+    description: Production
+
+tags:
+  - name: Courses
+    description: Course creation and management
+  - name: Sections
+    description: Course section management
+  - name: Lessons
+    description: Lesson content management
+  - name: Quizzes
+    description: Quiz and question management
+
+paths:
+  /instructor/courses:
+    get:
+      tags:
+        - Courses
+      summary: List instructor's courses
+      description: Get all courses created by the authenticated instructor
+      security:
+        - sanctum: []
+      parameters:
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [draft, published, unpublished]
+          description: Filter by course status
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: per_page
+          in: query
+          schema:
+            type: integer
+            default: 15
+            maximum: 100
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Course'
+                  meta:
+                    $ref: '#/components/schemas/PaginationMeta'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+    post:
+      tags:
+        - Courses
+      summary: Create new course
+      description: Create a new course draft
+      security:
+        - sanctum: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - title
+                - description
+                - category
+                - difficulty_level
+                - price
+              properties:
+                title:
+                  type: string
+                  maxLength: 255
+                  example: "Complete Web Development Bootcamp"
+                subtitle:
+                  type: string
+                  maxLength: 500
+                  example: "Learn HTML, CSS, JavaScript, and more"
+                description:
+                  type: string
+                  minLength: 100
+                  example: "This comprehensive course teaches you everything..."
+                learning_objectives:
+                  type: array
+                  items:
+                    type: string
+                  example: ["Build responsive websites", "Master JavaScript"]
+                category:
+                  type: string
+                  example: "Development"
+                subcategory:
+                  type: string
+                  example: "Web Development"
+                difficulty_level:
+                  type: string
+                  enum: [beginner, intermediate, advanced]
+                  example: "beginner"
+                price:
+                  type: number
+                  format: float
+                  minimum: 0
+                  maximum: 9999.99
+                  example: 49.99
+                currency:
+                  type: string
+                  default: "USD"
+                  example: "USD"
+      responses:
+        '201':
+          description: Course created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Course'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /instructor/courses/{courseId}:
+    get:
+      tags:
+        - Courses
+      summary: Get course details
+      description: Get detailed course information including sections and lessons
+      security:
+        - sanctum: []
+      parameters:
+        - name: courseId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/CourseDetail'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    put:
+      tags:
+        - Courses
+      summary: Update course
+      description: Update course details
+      security:
+        - sanctum: []
+      parameters:
+        - name: courseId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CourseUpdateRequest'
+      responses:
+        '200':
+          description: Course updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Course'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    delete:
+      tags:
+        - Courses
+      summary: Delete course
+      description: Soft delete course (cannot delete if students enrolled)
+      security:
+        - sanctum: []
+      parameters:
+        - name: courseId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: Course deleted successfully
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '422':
+          description: Cannot delete course with active enrollments
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /instructor/courses/{courseId}/publish:
+    post:
+      tags:
+        - Courses
+      summary: Publish course
+      description: Publish course to make it visible in the catalog
+      security:
+        - sanctum: []
+      parameters:
+        - name: courseId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Course published successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Course'
+                  message:
+                    type: string
+                    example: "Course published successfully"
+        '400':
+          description: Course validation failed (missing required content)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Course must have at least one section with one video lesson"
+                  errors:
+                    type: array
+                    items:
+                      type: string
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /instructor/courses/{courseId}/unpublish:
+    post:
+      tags:
+        - Courses
+      summary: Unpublish course
+      description: Remove course from public catalog (enrolled students retain access)
+      security:
+        - sanctum: []
+      parameters:
+        - name: courseId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Course unpublished successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Course'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /instructor/courses/{courseId}/thumbnail:
+    post:
+      tags:
+        - Courses
+      summary: Upload course thumbnail
+      description: Upload course cover image
+      security:
+        - sanctum: []
+      parameters:
+        - name: courseId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - thumbnail
+              properties:
+                thumbnail:
+                  type: string
+                  format: binary
+                  description: Image file (JPG, PNG, max 5MB)
+      responses:
+        '200':
+          description: Thumbnail uploaded successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      thumbnail_url:
+                        type: string
+                        example: "https://cdn.learningplatform.com/thumbnails/course123.jpg"
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /instructor/courses/{courseId}/sections:
+    get:
+      tags:
+        - Sections
+      summary: List course sections
+      description: Get all sections for a course
+      security:
+        - sanctum: []
+      parameters:
+        - name: courseId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Section'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+    post:
+      tags:
+        - Sections
+      summary: Create section
+      description: Add new section to course
+      security:
+        - sanctum: []
+      parameters:
+        - name: courseId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - title
+                - order
+              properties:
+                title:
+                  type: string
+                  maxLength: 255
+                  example: "Introduction to JavaScript"
+                description:
+                  type: string
+                  example: "Learn the basics of JavaScript programming"
+                order:
+                  type: integer
+                  minimum: 1
+                  example: 1
+      responses:
+        '201':
+          description: Section created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Section'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /instructor/sections/{sectionId}:
+    put:
+      tags:
+        - Sections
+      summary: Update section
+      description: Update section details
+      security:
+        - sanctum: []
+      parameters:
+        - name: sectionId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                  maxLength: 255
+                description:
+                  type: string
+                order:
+                  type: integer
+                  minimum: 1
+      responses:
+        '200':
+          description: Section updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Section'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+    delete:
+      tags:
+        - Sections
+      summary: Delete section
+      description: Delete section and all its lessons
+      security:
+        - sanctum: []
+      parameters:
+        - name: sectionId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: Section deleted successfully
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /instructor/sections/{sectionId}/lessons:
+    post:
+      tags:
+        - Lessons
+      summary: Create lesson
+      description: Add new lesson to section
+      security:
+        - sanctum: []
+      parameters:
+        - name: sectionId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - title
+                - type
+                - order
+              properties:
+                title:
+                  type: string
+                  maxLength: 255
+                  example: "Variables and Data Types"
+                type:
+                  type: string
+                  enum: [video, quiz, article]
+                  example: "video"
+                content:
+                  type: object
+                  description: Type-specific content (initially empty for video, filled after upload)
+                order:
+                  type: integer
+                  minimum: 1
+                  example: 1
+                is_preview:
+                  type: boolean
+                  default: false
+                  example: false
+      responses:
+        '201':
+          description: Lesson created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Lesson'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /instructor/lessons/{lessonId}/upload-video:
+    post:
+      tags:
+        - Lessons
+      summary: Get video upload URL
+      description: Generate pre-signed S3 upload URL for video
+      security:
+        - sanctum: []
+      parameters:
+        - name: lessonId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - filename
+                - file_size
+              properties:
+                filename:
+                  type: string
+                  example: "lesson1.mp4"
+                file_size:
+                  type: integer
+                  description: File size in bytes
+                  maximum: 5368709120
+                  example: 104857600
+                content_type:
+                  type: string
+                  example: "video/mp4"
+      responses:
+        '200':
+          description: Upload URL generated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  upload_url:
+                    type: string
+                    example: "https://s3.amazonaws.com/bucket/videos/..."
+                  upload_fields:
+                    type: object
+                    description: Additional fields for multipart upload
+                  expires_at:
+                    type: string
+                    format: date-time
+                    example: "2025-12-06T12:00:00Z"
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /instructor/lessons/{lessonId}:
+    put:
+      tags:
+        - Lessons
+      summary: Update lesson
+      description: Update lesson details
+      security:
+        - sanctum: []
+      parameters:
+        - name: lessonId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                content:
+                  type: object
+                order:
+                  type: integer
+                is_preview:
+                  type: boolean
+      responses:
+        '200':
+          description: Lesson updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Lesson'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+    delete:
+      tags:
+        - Lessons
+      summary: Delete lesson
+      description: Delete lesson and associated content
+      security:
+        - sanctum: []
+      parameters:
+        - name: lessonId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: Lesson deleted successfully
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+components:
+  securitySchemes:
+    sanctum:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    Course:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        instructor_id:
+          type: string
+          format: uuid
+        title:
+          type: string
+        subtitle:
+          type: string
+        description:
+          type: string
+        category:
+          type: string
+        subcategory:
+          type: string
+        difficulty_level:
+          type: string
+          enum: [beginner, intermediate, advanced]
+        thumbnail:
+          type: string
+          format: uri
+        price:
+          type: number
+          format: float
+        currency:
+          type: string
+        status:
+          type: string
+          enum: [draft, published, unpublished]
+        average_rating:
+          type: number
+          format: float
+          nullable: true
+        total_enrollments:
+          type: integer
+        total_reviews:
+          type: integer
+        published_at:
+          type: string
+          format: date-time
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    CourseDetail:
+      allOf:
+        - $ref: '#/components/schemas/Course'
+        - type: object
+          properties:
+            learning_objectives:
+              type: array
+              items:
+                type: string
+            sections:
+              type: array
+              items:
+                $ref: '#/components/schemas/SectionWithLessons'
+
+    CourseUpdateRequest:
+      type: object
+      properties:
+        title:
+          type: string
+        subtitle:
+          type: string
+        description:
+          type: string
+        learning_objectives:
+          type: array
+          items:
+            type: string
+        category:
+          type: string
+        subcategory:
+          type: string
+        difficulty_level:
+          type: string
+          enum: [beginner, intermediate, advanced]
+        price:
+          type: number
+          format: float
+
+    Section:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        course_id:
+          type: string
+          format: uuid
+        title:
+          type: string
+        description:
+          type: string
+        order:
+          type: integer
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    SectionWithLessons:
+      allOf:
+        - $ref: '#/components/schemas/Section'
+        - type: object
+          properties:
+            lessons:
+              type: array
+              items:
+                $ref: '#/components/schemas/Lesson'
+
+    Lesson:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        section_id:
+          type: string
+          format: uuid
+        title:
+          type: string
+        type:
+          type: string
+          enum: [video, quiz, article]
+        content:
+          type: object
+        duration:
+          type: integer
+          nullable: true
+        is_preview:
+          type: boolean
+        order:
+          type: integer
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    PaginationMeta:
+      type: object
+      properties:
+        current_page:
+          type: integer
+        last_page:
+          type: integer
+        per_page:
+          type: integer
+        total:
+          type: integer
+        from:
+          type: integer
+        to:
+          type: integer
+
+    Error:
+      type: object
+      properties:
+        message:
+          type: string
+        errors:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              type: string
+
+  responses:
+    Unauthorized:
+      description: Unauthenticated
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+                example: "Unauthenticated."
+
+    Forbidden:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+                example: "This action is unauthorized."
+
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+                example: "Resource not found."
+
+    ValidationError:
+      description: Validation error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            message: "The given data was invalid."
+            errors:
+              title: ["The title field is required."]
+              price: ["The price must be at least 0."]
+

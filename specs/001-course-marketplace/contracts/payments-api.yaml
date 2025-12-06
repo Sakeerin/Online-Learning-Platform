@@ -1,0 +1,195 @@
+openapi: 3.0.3
+info:
+  title: Payment Processing API
+  description: API endpoints for course purchases, transactions, and refunds
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:8000/api/v1
+
+tags:
+  - name: Checkout
+  - name: Transactions
+  - name: Refunds
+
+paths:
+  /student/checkout:
+    post:
+      tags:
+        - Checkout
+      summary: Create checkout session
+      description: Create Stripe Checkout session for course purchase
+      security:
+        - sanctum: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - course_id
+              properties:
+                course_id:
+                  type: string
+                  format: uuid
+                discount_code:
+                  type: string
+                  nullable: true
+      responses:
+        '200':
+          description: Checkout session created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  checkout_url:
+                    type: string
+                    example: "https://checkout.stripe.com/..."
+                  session_id:
+                    type: string
+        '400':
+          description: Already enrolled or invalid course
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /webhooks/stripe:
+    post:
+      tags:
+        - Checkout
+      summary: Stripe webhook
+      description: Handle Stripe payment events (internal)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: Webhook processed
+
+  /student/transactions:
+    get:
+      tags:
+        - Transactions
+      summary: Purchase history
+      description: Get student's transaction history
+      security:
+        - sanctum: []
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Transaction'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /student/transactions/{transactionId}/refund:
+    post:
+      tags:
+        - Refunds
+      summary: Request refund
+      description: Request refund for course purchase (30-day policy)
+      security:
+        - sanctum: []
+      parameters:
+        - name: transactionId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - reason
+              properties:
+                reason:
+                  type: string
+                  maxLength: 500
+      responses:
+        '200':
+          description: Refund processed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Refund approved"
+                  data:
+                    $ref: '#/components/schemas/Transaction'
+        '400':
+          description: Refund not eligible
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Refund period expired or content usage exceeds 30%"
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+components:
+  securitySchemes:
+    sanctum:
+      type: http
+      scheme: bearer
+
+  schemas:
+    Transaction:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        course_id:
+          type: string
+          format: uuid
+        course_title:
+          type: string
+        amount:
+          type: number
+          format: float
+        currency:
+          type: string
+        status:
+          type: string
+          enum: [pending, completed, refunded]
+        payment_method:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+        refunded_at:
+          type: string
+          format: date-time
+          nullable: true
+
+  responses:
+    Unauthorized:
+      description: Unauthenticated
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+

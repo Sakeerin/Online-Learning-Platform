@@ -1,0 +1,30 @@
+﻿# Online-Learning-Platform Development Guidelines
+
+Auto-generated from all feature plans. Last updated: 2025-12-06
+
+## Active Technologies
+
+- PHP 8.2+ (backend), TypeScript 5.x (frontend) + Laravel 11.x, Vue.js 3.x with Composition API, Inertia.js (optional) or standalone SPA (001-course-marketplace)
+
+## Project Structure
+
+```text
+backend/
+frontend/
+tests/
+```
+
+## Commands
+
+npm test; npm run lint
+
+## Code Style
+
+PHP 8.2+ (backend), TypeScript 5.x (frontend): Follow standard conventions
+
+## Recent Changes
+
+- 001-course-marketplace: Added PHP 8.2+ (backend), TypeScript 5.x (frontend) + Laravel 11.x, Vue.js 3.x with Composition API, Inertia.js (optional) or standalone SPA
+
+<!-- MANUAL ADDITIONS START -->
+<!-- MANUAL ADDITIONS END -->

@@ -1,0 +1,724 @@
+openapi: 3.0.3
+info:
+  title: Student Enrollment & Learning API
+  description: API endpoints for students to discover, enroll in, and learn from courses
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:8000/api/v1
+    description: Local development
+  - url: https://api.learningplatform.com/v1
+    description: Production
+
+tags:
+  - name: Discovery
+    description: Course browsing and search
+  - name: Enrollment
+    description: Course enrollment management
+  - name: Learning
+    description: Video playback and progress tracking
+  - name: Certificates
+    description: Course completion certificates
+
+paths:
+  /courses:
+    get:
+      tags:
+        - Discovery
+      summary: Browse courses
+      description: Get paginated list of published courses with filters
+      parameters:
+        - name: category
+          in: query
+          schema:
+            type: string
+          description: Filter by category
+        - name: subcategory
+          in: query
+          schema:
+            type: string
+        - name: difficulty
+          in: query
+          schema:
+            type: string
+            enum: [beginner, intermediate, advanced]
+        - name: price
+          in: query
+          schema:
+            type: string
+            enum: [free, paid]
+        - name: min_rating
+          in: query
+          schema:
+            type: number
+            format: float
+            minimum: 0
+            maximum: 5
+        - name: search
+          in: query
+          schema:
+            type: string
+          description: Search by title/description
+        - name: sort
+          in: query
+          schema:
+            type: string
+            enum: [newest, rating, enrollments, price_low, price_high]
+            default: newest
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: per_page
+          in: query
+          schema:
+            type: integer
+            default: 12
+            maximum: 50
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/CourseCard'
+                  meta:
+                    $ref: '#/components/schemas/PaginationMeta'
+
+  /courses/{courseId}:
+    get:
+      tags:
+        - Discovery
+      summary: Get course details
+      description: Get full course information (public - no auth required)
+      parameters:
+        - name: courseId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/CourseDetailPublic'
+        '404':
+          description: Course not found
+
+  /student/enrollments:
+    get:
+      tags:
+        - Enrollment
+      summary: My learning
+      description: Get all courses the student is enrolled in
+      security:
+        - sanctum: []
+      parameters:
+        - name: filter
+          in: query
+          schema:
+            type: string
+            enum: [all, in_progress, completed]
+            default: all
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/EnrollmentWithCourse'
+                  meta:
+                    $ref: '#/components/schemas/PaginationMeta'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+    post:
+      tags:
+        - Enrollment
+      summary: Enroll in course
+      description: Enroll student in a free course
+      security:
+        - sanctum: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - course_id
+              properties:
+                course_id:
+                  type: string
+                  format: uuid
+      responses:
+        '201':
+          description: Enrolled successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Enrollment'
+                  message:
+                    type: string
+                    example: "Successfully enrolled in course"
+        '400':
+          description: Already enrolled or course is paid
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "You are already enrolled in this course"
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          description: Course not found
+
+  /student/enrollments/{enrollmentId}:
+    get:
+      tags:
+        - Learning
+      summary: Get enrollment details
+      description: Get enrollment with course content and progress
+      security:
+        - sanctum: []
+      parameters:
+        - name: enrollmentId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/EnrollmentDetail'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          description: Not your enrollment
+        '404':
+          description: Enrollment not found
+
+  /student/enrollments/{enrollmentId}/lessons/{lessonId}/video:
+    get:
+      tags:
+        - Learning
+      summary: Get video playback URL
+      description: Get signed CloudFront URL for video streaming
+      security:
+        - sanctum: []
+      parameters:
+        - name: enrollmentId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: lessonId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: quality
+          in: query
+          schema:
+            type: string
+            enum: ['1080p', '720p', '480p', '360p']
+            default: '720p'
+      responses:
+        '200':
+          description: Video URL generated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  video_url:
+                    type: string
+                    example: "https://cdn.learningplatform.com/videos/..."
+                  expires_at:
+                    type: string
+                    format: date-time
+                  available_qualities:
+                    type: array
+                    items:
+                      type: string
+                  captions_url:
+                    type: string
+                    nullable: true
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          description: Not enrolled in this course
+        '404':
+          description: Lesson not found
+
+  /student/enrollments/{enrollmentId}/lessons/{lessonId}/progress:
+    post:
+      tags:
+        - Learning
+      summary: Update lesson progress
+      description: Save video playback position and mark lesson complete
+      security:
+        - sanctum: []
+      parameters:
+        - name: enrollmentId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: lessonId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                video_position:
+                  type: integer
+                  description: Current playback position in seconds
+                  example: 145
+                is_completed:
+                  type: boolean
+                  description: Manually mark as complete (or auto-detected at 95%)
+                  example: false
+      responses:
+        '200':
+          description: Progress updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Progress'
+                  enrollment_progress:
+                    type: number
+                    format: float
+                    description: Overall course progress percentage
+                    example: 45.5
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          description: Not enrolled
+
+  /student/enrollments/{enrollmentId}/certificate:
+    get:
+      tags:
+        - Certificates
+      summary: Get certificate
+      description: Get certificate for completed course
+      security:
+        - sanctum: []
+      parameters:
+        - name: enrollmentId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Certificate available
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Certificate'
+        '400':
+          description: Course not completed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Complete all lessons to earn certificate"
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          description: Enrollment not found
+
+  /certificates/verify/{verificationCode}:
+    get:
+      tags:
+        - Certificates
+      summary: Verify certificate
+      description: Public endpoint to verify certificate authenticity
+      parameters:
+        - name: verificationCode
+          in: path
+          required: true
+          schema:
+            type: string
+            pattern: '^[A-Z0-9]{32}$'
+      responses:
+        '200':
+          description: Certificate valid
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  valid:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/CertificatePublic'
+        '404':
+          description: Invalid verification code
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  valid:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: "Certificate not found"
+
+components:
+  securitySchemes:
+    sanctum:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    CourseCard:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        title:
+          type: string
+        subtitle:
+          type: string
+        thumbnail:
+          type: string
+          format: uri
+        price:
+          type: number
+          format: float
+        currency:
+          type: string
+        difficulty_level:
+          type: string
+        average_rating:
+          type: number
+          format: float
+          nullable: true
+        total_enrollments:
+          type: integer
+        total_reviews:
+          type: integer
+        instructor:
+          type: object
+          properties:
+            id:
+              type: string
+              format: uuid
+            name:
+              type: string
+
+    CourseDetailPublic:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        title:
+          type: string
+        subtitle:
+          type: string
+        description:
+          type: string
+        learning_objectives:
+          type: array
+          items:
+            type: string
+        category:
+          type: string
+        subcategory:
+          type: string
+        difficulty_level:
+          type: string
+        thumbnail:
+          type: string
+          format: uri
+        price:
+          type: number
+        currency:
+          type: string
+        average_rating:
+          type: number
+          nullable: true
+        total_enrollments:
+          type: integer
+        total_reviews:
+          type: integer
+        instructor:
+          type: object
+          properties:
+            id:
+              type: string
+              format: uuid
+            name:
+              type: string
+            bio:
+              type: string
+            profile_photo:
+              type: string
+        curriculum:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+                format: uuid
+              title:
+                type: string
+              lessons:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                      format: uuid
+                    title:
+                      type: string
+                    type:
+                      type: string
+                    duration:
+                      type: integer
+                      nullable: true
+                    is_preview:
+                      type: boolean
+        reviews:
+          type: array
+          items:
+            $ref: '#/components/schemas/Review'
+
+    Enrollment:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        user_id:
+          type: string
+          format: uuid
+        course_id:
+          type: string
+          format: uuid
+        enrolled_at:
+          type: string
+          format: date-time
+        last_accessed_at:
+          type: string
+          format: date-time
+          nullable: true
+        progress_percentage:
+          type: number
+          format: float
+        is_completed:
+          type: boolean
+        completed_at:
+          type: string
+          format: date-time
+          nullable: true
+
+    EnrollmentWithCourse:
+      allOf:
+        - $ref: '#/components/schemas/Enrollment'
+        - type: object
+          properties:
+            course:
+              $ref: '#/components/schemas/CourseCard'
+
+    EnrollmentDetail:
+      allOf:
+        - $ref: '#/components/schemas/Enrollment'
+        - type: object
+          properties:
+            course:
+              $ref: '#/components/schemas/CourseDetailPublic'
+            progress:
+              type: array
+              description: Lesson completion status
+              items:
+                type: object
+                properties:
+                  lesson_id:
+                    type: string
+                    format: uuid
+                  is_completed:
+                    type: boolean
+                  video_position:
+                    type: integer
+                    nullable: true
+
+    Progress:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        enrollment_id:
+          type: string
+          format: uuid
+        lesson_id:
+          type: string
+          format: uuid
+        is_completed:
+          type: boolean
+        video_position:
+          type: integer
+          nullable: true
+        completed_at:
+          type: string
+          format: date-time
+          nullable: true
+        updated_at:
+          type: string
+          format: date-time
+
+    Certificate:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        enrollment_id:
+          type: string
+          format: uuid
+        user_id:
+          type: string
+          format: uuid
+        course_id:
+          type: string
+          format: uuid
+        verification_code:
+          type: string
+        certificate_url:
+          type: string
+          format: uri
+        issued_at:
+          type: string
+          format: date-time
+
+    CertificatePublic:
+      type: object
+      properties:
+        student_name:
+          type: string
+        course_title:
+          type: string
+        issued_at:
+          type: string
+          format: date-time
+        verification_code:
+          type: string
+
+    Review:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        rating:
+          type: integer
+          minimum: 1
+          maximum: 5
+        review_text:
+          type: string
+        helpful_votes:
+          type: integer
+        instructor_response:
+          type: string
+          nullable: true
+        reviewer:
+          type: object
+          properties:
+            name:
+              type: string
+            profile_photo:
+              type: string
+        created_at:
+          type: string
+          format: date-time
+
+    PaginationMeta:
+      type: object
+      properties:
+        current_page:
+          type: integer
+        last_page:
+          type: integer
+        per_page:
+          type: integer
+        total:
+          type: integer
+
+  responses:
+    Unauthorized:
+      description: Unauthenticated
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+                example: "Unauthenticated."
+
