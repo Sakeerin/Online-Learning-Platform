@@ -1,143 +1,275 @@
-# Online Learning Platform
+# Course Marketplace Platform
 
-A production-ready Learning Management System (LMS) built with Laravel and Vue.js, designed for scalability, security, and accessibility.
+A comprehensive Udemy-style online learning marketplace built with Laravel 11 and Vue.js 3, where instructors create and monetize courses, and students discover, purchase, and learn through video-based content with interactive features.
 
-## 🎯 Vision
+## 🎯 Project Status
 
-Deliver a modern, accessible, and secure learning platform that serves students, instructors, and administrators with an exceptional user experience.
+✅ **Phase 1: Project Setup - COMPLETE**
+
+**Current State**:
+- ✅ Project structure initialized (backend/, frontend/, docker/)
+- ✅ Laravel 11 backend with PHP 8.2
+- ✅ Vue.js 3 + TypeScript frontend with Vite
+- ✅ Docker environment (PostgreSQL, Redis, Mailpit)
+- ✅ Basic configuration and tooling
+
+**Next Steps**: Phase 2 - Foundational Infrastructure (see `specs/001-course-marketplace/tasks.md`)
 
 ## 🏗️ Architecture
 
-**API-First Design**:
-- **Backend**: Laravel 11.x REST API (PHP 8.2+)
-- **Frontend**: Vue.js 3.x SPA with TypeScript
-- **Database**: PostgreSQL 14+ (recommended) or MySQL 8.0+
-- **Caching**: Redis 7.x
-- **Real-time**: Laravel Broadcasting with Pusher/Socket.io
+**API-First Design** (Constitution Principle I):
+- **Backend**: Laravel 11.x REST API (PHP 8.2+) at `/api/v1/*`
+- **Frontend**: Vue.js 3.x SPA with TypeScript and Composition API
+- **Database**: PostgreSQL 14+ 
+- **Caching**: Redis 7.x (cache, sessions, queues)
+- **Storage**: AWS S3 + CloudFront CDN for video content
+- **Payments**: Stripe integration for course monetization
 
 ## 📋 Prerequisites
 
+### Option 1: Docker (Recommended)
+- Docker Desktop installed and running
+- That's it! Docker handles PHP, PostgreSQL, Redis, Node.js
+
+### Option 2: Local Development
 - PHP 8.2 or higher
 - Composer 2.x
-- Node.js 18.x or higher
-- PostgreSQL 14+ or MySQL 8.0+
+- Node.js 18.x or higher  
+- PostgreSQL 14+
 - Redis 7.x
 
 ## 🚀 Quickstart (< 10 minutes)
 
-### 1. Clone & Install Dependencies
+### Using Docker (Recommended)
 
 ```bash
-# Clone repository
+# 1. Clone the repository (if not already cloned)
 git clone https://github.com/your-org/online-learning-platform.git
 cd online-learning-platform
 
-# Install backend dependencies
-composer install
+# 2. Copy environment files
+cp backend/env.template backend/.env
+cp frontend/env.template frontend/.env
 
-# Install frontend dependencies
+# 3. Start Docker services
+docker-compose up -d
+
+# 4. Install backend dependencies
+docker-compose exec app composer install
+
+# 5. Generate Laravel application key
+docker-compose exec app php artisan key:generate
+
+# 6. Run database migrations
+docker-compose exec app php artisan migrate
+
+# 7. Install frontend dependencies (in a new terminal)
+cd frontend
 npm install
+
+# 8. Start frontend development server
+npm run dev
 ```
 
-### 2. Environment Configuration
+**Access the platform**:
+- **Frontend**: http://localhost:5173
+- **Backend API**: http://localhost:8000/api/v1
+- **Health Check**: http://localhost:8000/api/health
+- **Mailpit** (Email Testing): http://localhost:8025
+
+### Using Local Development
 
 ```bash
-# Copy environment file
-cp .env.example .env
+# 1. Clone and setup environment
+git clone https://github.com/your-org/online-learning-platform.git
+cd online-learning-platform
+cp backend/env.template backend/.env
+cp frontend/env.template frontend/.env
 
-# Generate application key
+# 2. Configure backend .env file
+# Update DB_HOST=127.0.0.1 (not 'pgsql')
+# Update REDIS_HOST=127.0.0.1 (not 'redis')
+# Update MAIL_HOST to your local mail server
+
+# 3. Install backend dependencies
+cd backend
+composer install
 php artisan key:generate
-
-# Configure database in .env
-DB_CONNECTION=pgsql
-DB_HOST=127.0.0.1
-DB_PORT=5432
-DB_DATABASE=learning_platform
-DB_USERNAME=your_username
-DB_PASSWORD=your_password
-
-# Configure Redis
-REDIS_HOST=127.0.0.1
-REDIS_PASSWORD=null
-REDIS_PORT=6379
-```
-
-### 3. Database Setup
-
-```bash
-# Run migrations
 php artisan migrate
 
-# Seed initial data (optional)
-php artisan db:seed
+# 4. Install frontend dependencies
+cd ../frontend
+npm install
+
+# 5. Start services (separate terminals)
+# Terminal 1: Backend
+cd backend && php artisan serve
+
+# Terminal 2: Frontend  
+cd frontend && npm run dev
+
+# Terminal 3: Queue worker (for background jobs)
+cd backend && php artisan queue:work
 ```
 
-### 4. Start Development Servers
+## 📁 Project Structure
 
-```bash
-# Terminal 1: Laravel backend (API)
-php artisan serve
-# API available at http://localhost:8000
-
-# Terminal 2: Vite frontend dev server
-npm run dev
-# Frontend available at http://localhost:5173
 ```
-
-### 5. Access the Platform
-
-- **Frontend**: http://localhost:5173
-- **API**: http://localhost:8000/api/v1
-- **API Documentation**: http://localhost:8000/api/documentation (if configured)
+online-learning-platform/
+├── backend/                 # Laravel 11 API
+│   ├── app/
+│   │   ├── Models/         # Eloquent models (to be created)
+│   │   ├── Http/
+│   │   │   ├── Controllers/Api/V1/  # API controllers
+│   │   │   ├── Requests/   # Form validation
+│   │   │   └── Resources/  # API transformers
+│   │   ├── Services/       # Business logic
+│   │   ├── Policies/       # Authorization
+│   │   └── Jobs/           # Background tasks
+│   ├── database/
+│   │   ├── migrations/     # Database schema
+│   │   └── seeders/        # Test data
+│   ├── routes/
+│   │   └── api.php         # API routes (/api/v1/*)
+│   └── tests/              # PHPUnit tests
+│
+├── frontend/               # Vue.js 3 SPA
+│   ├── src/
+│   │   ├── components/    # Vue components
+│   │   ├── views/         # Page components
+│   │   ├── stores/        # Pinia state management
+│   │   ├── services/      # API clients (axios)
+│   │   ├── router/        # Vue Router
+│   │   └── types/         # TypeScript interfaces
+│   └── tests/             # Vitest tests
+│
+├── docker/                # Docker configuration
+│   ├── Dockerfile.backend
+│   ├── Dockerfile.frontend
+│   └── nginx/
+│
+├── specs/                 # Project specifications
+│   └── 001-course-marketplace/
+│       ├── spec.md        # Feature requirements
+│       ├── plan.md        # Implementation plan
+│       ├── tasks.md       # Task breakdown (280 tasks)
+│       ├── data-model.md  # Database design
+│       └── contracts/     # API contracts
+│
+└── docker-compose.yml     # Docker services
+```
 
 ## 🧪 Running Tests
 
+**Backend (PHPUnit)**:
 ```bash
-# Backend tests
-php artisan test
+# Using Docker
+docker-compose exec app php artisan test
 
-# Frontend tests
-npm run test
+# Local
+cd backend && php artisan test
 
-# E2E tests
-php artisan dusk
-
-# Run all tests
-composer test && npm test
+# With coverage
+php artisan test --coverage
 ```
 
-## 📚 Constitution & Standards
+**Frontend (Vitest)**:
+```bash
+cd frontend
+npm run test           # Run once
+npm run test:watch     # Watch mode
+npm run test:coverage  # With coverage
+```
 
-This project follows strict development standards defined in our **[Constitution](.specify/memory/constitution.md)**. All features must comply with these core principles:
+## 📚 Project Documentation
 
-### Core Principles
+**Core Documents**:
+- **[Constitution](.specify/memory/constitution.md)** - 7 core development principles (NON-NEGOTIABLE)
+- **[Feature Spec](specs/001-course-marketplace/spec.md)** - 9 user stories with acceptance criteria
+- **[Implementation Plan](specs/001-course-marketplace/plan.md)** - Technical strategy & architecture
+- **[Task Breakdown](specs/001-course-marketplace/tasks.md)** - 280 executable tasks
+- **[Data Model](specs/001-course-marketplace/data-model.md)** - 14 entities with relationships
+- **[API Contracts](specs/001-course-marketplace/contracts/)** - OpenAPI specifications
+- **[Research](specs/001-course-marketplace/research.md)** - Technology decisions & rationale
 
-1. **API-First Architecture** - Clean separation between Laravel backend and Vue.js frontend
-2. **Security & Data Protection** - FERPA/GDPR compliance, encryption, RBAC
-3. **Test-First Development** - Tests written before implementation (NON-NEGOTIABLE)
-4. **Accessibility Standards** - WCAG 2.1 AA minimum for all UI
-5. **Performance & Scalability** - <200ms API response, handles 1000+ concurrent users
-6. **Modular Feature Design** - Independent, testable, deployable features
-7. **Documentation & User Experience** - Self-service learning, actionable errors
+### Constitution: 7 Core Principles
 
-**📖 Read the full constitution**: [.specify/memory/constitution.md](.specify/memory/constitution.md)
+All development MUST comply with these principles:
+
+1. ✅ **API-First Architecture** - Laravel REST API + Vue.js SPA separation
+2. ✅ **Security & Data Protection** - FERPA/GDPR compliance, encryption, RBAC (NON-NEGOTIABLE)
+3. ✅ **Test-First Development** - 80% backend, 70% frontend coverage (NON-NEGOTIABLE)
+4. ✅ **Accessibility Standards** - WCAG 2.1 AA minimum
+5. ✅ **Performance & Scalability** - <200ms API, 1000+ concurrent streams
+6. ✅ **Modular Feature Design** - Independent, testable features
+7. ✅ **Documentation & User Experience** - Self-service, actionable errors
+
+**📖 Full Constitution**: [.specify/memory/constitution.md](.specify/memory/constitution.md)
 
 ## 🛠️ Development Workflow
 
-### Creating a New Feature
+### Current Implementation Status
 
+**✅ Phase 1: Project Setup** (COMPLETE)
+- Project structure initialized
+- Laravel 11 & Vue.js 3 configured
+- Docker environment ready
+- Basic tooling in place
+
+**⏭️ Next: Phase 2 - Foundational Infrastructure**
+
+See `specs/001-course-marketplace/tasks.md` for the complete 280-task breakdown organized by user story.
+
+### Implementing Features
+
+Follow the task-driven approach defined in `tasks.md`:
+
+1. **Phase 2: Foundational** (T019-T060) - 42 tasks
+   - Database migrations for all entities
+   - Authentication & authorization infrastructure
+   - Core middleware and guards
+   - BLOCKS all user story development
+
+2. **Phase 3-5: MVP (P1)** - User Stories 1-3
+   - US1: Instructor Course Creation (T061-T098)
+   - US2: Student Course Discovery (T099-T121)
+   - US3: Course Enrollment & Video Learning (T122-T161)
+
+3. **Phase 6-8: Enhanced (P2)** - User Stories 4-6
+   - US4: Payment & Transactions
+   - US5: Reviews & Ratings
+   - US6: Progress Tracking & Certificates
+
+4. **Phase 9-11: Advanced (P3)** - User Stories 7-9
+   - US7: Interactive Quizzes
+   - US8: Course Discussions
+   - US9: Instructor Analytics
+
+### Development Commands
+
+**Backend**:
 ```bash
-# 1. Create feature specification
-# Use /speckit.specify command or create in specs/[###-feature-name]/spec.md
+# With Docker
+docker-compose exec app php artisan migrate
+docker-compose exec app php artisan make:model Course -m
+docker-compose exec app php artisan make:controller Api/V1/CourseController
+docker-compose exec app php artisan test
 
-# 2. Generate implementation plan
-# Use /speckit.plan command - includes constitution check
+# Local
+cd backend
+php artisan migrate
+php artisan make:model Course -m
+php artisan test
+```
 
-# 3. Generate tasks
-# Use /speckit.tasks command
-
-# 4. Implement with test-first approach
-# Write tests → Tests fail → Implement → Tests pass → Refactor
+**Frontend**:
+```bash
+cd frontend
+npm run dev          # Start dev server
+npm run build        # Build for production
+npm run lint         # Run ESLint
+npm run format       # Run Prettier
+npm run type-check   # TypeScript validation
 ```
 
 ### Code Quality Standards
@@ -252,13 +384,54 @@ All features meet **WCAG 2.1 Level AA** standards:
 - **Feature Specs**: [specs/](specs/)
 - **Contributing Guide**: [CONTRIBUTING.md](CONTRIBUTING.md) *(to be created)*
 
+## 🎯 Feature Implementation Roadmap
+
+### MVP (Priority P1) - Core Learning Loop
+| User Story | Tasks | Status | Description |
+|------------|-------|--------|-------------|
+| US1: Instructor Course Creation | T061-T098 | 📋 Planned | Create, organize, publish courses |
+| US2: Student Course Discovery | T099-T121 | 📋 Planned | Browse, search, filter courses |
+| US3: Course Enrollment & Learning | T122-T161 | 📋 Planned | Enroll, watch videos, track progress |
+
+**MVP Delivers**: Instructors create courses → Students discover → Students learn
+
+### Enhanced Features (Priority P2) - Monetization
+| User Story | Tasks | Status | Description |
+|------------|-------|--------|-------------|
+| US4: Payment & Transactions | T162-T191 | 📋 Planned | Stripe integration, revenue tracking |
+| US5: Reviews & Ratings | T192-T208 | 📋 Planned | Course reviews, social proof |
+| US6: Progress & Certificates | T209-T227 | 📋 Planned | Progress tracking, certificates |
+
+### Advanced Features (Priority P3) - Interactivity
+| User Story | Tasks | Status | Description |
+|------------|-------|--------|-------------|
+| US7: Interactive Quizzes | T228-T241 | 📋 Planned | Knowledge assessments |
+| US8: Course Discussions | T242-T253 | 📋 Planned | Q&A, community support |
+| US9: Instructor Analytics | T254-T265 | 📋 Planned | Revenue & engagement insights |
+
 ## 🤝 Contributing
 
-1. Read the [Constitution](.specify/memory/constitution.md)
-2. Create feature specification using `/speckit.specify`
-3. Follow test-first development workflow
-4. Ensure all quality gates pass
-5. Submit pull request with constitution compliance verification
+1. **Read Documentation**:
+   - [Constitution](.specify/memory/constitution.md) - Core principles
+   - [Contributing Guide](CONTRIBUTING.md) - Code standards & workflow
+   - [Task Breakdown](specs/001-course-marketplace/tasks.md) - What to work on
+
+2. **Pick a Task**: 
+   - Start with foundational tasks (T019-T060) if not complete
+   - Then pick from current user story phase
+   - Tasks marked [P] can run in parallel
+
+3. **Follow Standards**:
+   - Test-first development (write tests before code)
+   - PSR-12 coding standard (Laravel Pint)
+   - ESLint + Prettier for frontend
+   - 80% backend, 70% frontend test coverage
+
+4. **Submit PR**:
+   - Include constitution compliance checklist
+   - All tests passing
+   - No linter errors
+   - Accessibility verified (for UI changes)
 
 ## 📝 License
 
