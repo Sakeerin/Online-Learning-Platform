@@ -1,5 +1,8 @@
 <?php
 
+use App\Http\Controllers\Api\V1\Auth\LoginController;
+use App\Http\Controllers\Api\V1\Auth\PasswordResetController;
+use App\Http\Controllers\Api\V1\Auth\RegisterController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -27,10 +30,10 @@ Route::prefix('v1')->group(function () {
     
     // Authentication routes
     Route::prefix('auth')->group(function () {
-        // Will be implemented in Phase 2: Foundational
-        // Route::post('/register', [RegisterController::class, 'register']);
-        // Route::post('/login', [LoginController::class, 'login']);
-        // Route::post('/forgot-password', [PasswordResetController::class, 'sendResetLink']);
+        Route::post('/register', [RegisterController::class, 'register']);
+        Route::post('/login', [LoginController::class, 'login']);
+        Route::post('/forgot-password', [PasswordResetController::class, 'sendResetLink']);
+        Route::post('/reset-password', [PasswordResetController::class, 'reset']);
     });
 
     // Public course discovery routes
@@ -51,10 +54,7 @@ Route::prefix('v1')->group(function () {
 Route::middleware(['auth:sanctum'])->prefix('v1')->group(function () {
     
     // Authenticated user routes
-    Route::post('logout', function () {
-        // Will be implemented in Phase 2: Foundational
-        return response()->json(['message' => 'Logout endpoint']);
-    });
+    Route::post('auth/logout', [LoginController::class, 'logout']);
     
     // Instructor routes
     Route::prefix('instructor')->middleware(['role:instructor'])->group(function () {
