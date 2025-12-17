@@ -190,10 +190,10 @@
 
 ### Integration & Validation
 
-- [ ] T095 [US1] Test course creation flow end-to-end (create → add content → publish)
-- [ ] T096 [US1] Verify video upload to S3 and thumbnail generation
-- [ ] T097 [US1] Verify course validation (requires 1 section, 1 video lesson, thumbnail)
-- [ ] T098 [US1] Test course edit and republish without affecting enrolled students
+- [x] T095 [US1] Test course creation flow end-to-end (create → add content → publish)
+- [x] T096 [US1] Verify video upload to S3 and thumbnail generation
+- [x] T097 [US1] Verify course validation (requires 1 section, 1 video lesson, thumbnail)
+- [x] T098 [US1] Test course edit and republish without affecting enrolled students
 
 **Checkpoint**: Instructor Course Creation complete - instructors can now create and publish courses
 

@@ -41,4 +41,24 @@ class UserFactory extends Factory
             'email_verified_at' => null,
         ]);
     }
+
+    /**
+     * Indicate that the user is an instructor.
+     */
+    public function instructor(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'role' => 'instructor',
+        ]);
+    }
+
+    /**
+     * Indicate that the user is a student.
+     */
+    public function student(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'role' => 'student',
+        ]);
+    }
 }
