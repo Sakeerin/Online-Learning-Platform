@@ -33,6 +33,16 @@ const routes: Array<RouteRecordRaw> = [
         path: 'dashboard',
         name: 'instructor-dashboard',
         component: () => import('../views/Instructor/Dashboard.vue')
+      },
+      {
+        path: 'courses/create',
+        name: 'create-course',
+        component: () => import('../views/Instructor/CreateCourse.vue')
+      },
+      {
+        path: 'courses/:id/edit',
+        name: 'edit-course',
+        component: () => import('../views/Instructor/EditCourse.vue')
       }
     ]
   },

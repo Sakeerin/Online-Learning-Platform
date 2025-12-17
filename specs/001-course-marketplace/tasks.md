@@ -138,55 +138,55 @@
 
 ### Backend Models & Database
 
-- [ ] T061 [P] [US1] Create Course model in backend/app/Models/Course.php
-- [ ] T062 [P] [US1] Create Section model in backend/app/Models/Section.php
-- [ ] T063 [P] [US1] Create Lesson model in backend/app/Models/Lesson.php
-- [ ] T064 [P] [US1] Create CourseFactory in backend/database/factories/CourseFactory.php
-- [ ] T065 [P] [US1] Create SectionFactory in backend/database/factories/SectionFactory.php
-- [ ] T066 [P] [US1] Create LessonFactory in backend/database/factories/LessonFactory.php
+- [x] T061 [P] [US1] Create Course model in backend/app/Models/Course.php
+- [x] T062 [P] [US1] Create Section model in backend/app/Models/Section.php
+- [x] T063 [P] [US1] Create Lesson model in backend/app/Models/Lesson.php
+- [x] T064 [P] [US1] Create CourseFactory in backend/database/factories/CourseFactory.php
+- [x] T065 [P] [US1] Create SectionFactory in backend/database/factories/SectionFactory.php
+- [x] T066 [P] [US1] Create LessonFactory in backend/database/factories/LessonFactory.php
 
 ### Backend Business Logic
 
-- [ ] T067 [US1] Create CourseService with create, update, publish methods in backend/app/Services/CourseService.php
-- [ ] T068 [US1] Create PublishCourseAction for validation in backend/app/Actions/PublishCourseAction.php
-- [ ] T069 [P] [US1] Create CoursePolicy for authorization in backend/app/Policies/CoursePolicy.php
-- [ ] T070 [P] [US1] Create CreateCourseRequest form validation in backend/app/Http/Requests/CreateCourseRequest.php
-- [ ] T071 [P] [US1] Create UpdateCourseRequest form validation in backend/app/Http/Requests/UpdateCourseRequest.php
-- [ ] T072 [P] [US1] Create UploadVideoRequest form validation in backend/app/Http/Requests/UploadVideoRequest.php
+- [x] T067 [US1] Create CourseService with create, update, publish methods in backend/app/Services/CourseService.php
+- [x] T068 [US1] Create PublishCourseAction for validation in backend/app/Actions/PublishCourseAction.php
+- [x] T069 [P] [US1] Create CoursePolicy for authorization in backend/app/Policies/CoursePolicy.php
+- [x] T070 [P] [US1] Create CreateCourseRequest form validation in backend/app/Http/Requests/CreateCourseRequest.php
+- [x] T071 [P] [US1] Create UpdateCourseRequest form validation in backend/app/Http/Requests/UpdateCourseRequest.php
+- [x] T072 [P] [US1] Create UploadVideoRequest form validation in backend/app/Http/Requests/UploadVideoRequest.php
 
 ### Backend API Controllers & Routes
 
-- [ ] T073 [US1] Create CourseController in backend/app/Http/Controllers/Api/V1/Instructor/CourseController.php with CRUD methods
-- [ ] T074 [US1] Create SectionController in backend/app/Http/Controllers/Api/V1/Instructor/SectionController.php
-- [ ] T075 [US1] Create LessonController in backend/app/Http/Controllers/Api/V1/Instructor/LessonController.php
-- [ ] T076 [P] [US1] Create CourseResource API transformer in backend/app/Http/Resources/CourseResource.php
-- [ ] T077 [P] [US1] Create CourseDetailResource in backend/app/Http/Resources/CourseDetailResource.php
-- [ ] T078 [P] [US1] Create LessonResource in backend/app/Http/Resources/LessonResource.php
-- [ ] T079 [US1] Add instructor course routes to backend/routes/api.php under /api/v1/instructor/courses
+- [x] T073 [US1] Create CourseController in backend/app/Http/Controllers/Api/V1/Instructor/CourseController.php with CRUD methods
+- [x] T074 [US1] Create SectionController in backend/app/Http/Controllers/Api/V1/Instructor/SectionController.php
+- [x] T075 [US1] Create LessonController in backend/app/Http/Controllers/Api/V1/Instructor/LessonController.php
+- [x] T076 [P] [US1] Create CourseResource API transformer in backend/app/Http/Resources/CourseResource.php
+- [x] T077 [P] [US1] Create CourseDetailResource in backend/app/Http/Resources/CourseDetailResource.php
+- [x] T078 [P] [US1] Create LessonResource in backend/app/Http/Resources/LessonResource.php
+- [x] T079 [US1] Add instructor course routes to backend/routes/api.php under /api/v1/instructor/courses
 
 ### Backend Events & Jobs
 
-- [ ] T080 [P] [US1] Create CoursePublished event in backend/app/Events/CoursePublished.php
-- [ ] T081 [P] [US1] Create SendCoursePublishedNotification listener in backend/app/Listeners/SendCoursePublishedNotification.php
-- [ ] T082 [P] [US1] Create ProcessVideoUpload job in backend/app/Jobs/ProcessVideoUpload.php
-- [ ] T083 [P] [US1] Create GenerateVideoThumbnail job in backend/app/Jobs/GenerateVideoThumbnail.php
+- [x] T080 [P] [US1] Create CoursePublished event in backend/app/Events/CoursePublished.php
+- [x] T081 [P] [US1] Create SendCoursePublishedNotification listener in backend/app/Listeners/SendCoursePublishedNotification.php
+- [x] T082 [P] [US1] Create ProcessVideoUpload job in backend/app/Jobs/ProcessVideoUpload.php
+- [x] T083 [P] [US1] Create GenerateVideoThumbnail job in backend/app/Jobs/GenerateVideoThumbnail.php
 
 ### Frontend State Management
 
-- [ ] T084 [US1] Create course store in frontend/src/stores/course.ts
-- [ ] T085 [P] [US1] Create useCourses composable in frontend/src/composables/useCourses.ts
-- [ ] T086 [P] [US1] Create courseService API client in frontend/src/services/courseService.ts
-- [ ] T087 [P] [US1] Create Course TypeScript interface in frontend/src/types/Course.ts
+- [x] T084 [US1] Create course store in frontend/src/stores/course.ts
+- [x] T085 [P] [US1] Create useCourses composable in frontend/src/composables/useCourses.ts
+- [x] T086 [P] [US1] Create courseService API client in frontend/src/services/courseService.ts
+- [x] T087 [P] [US1] Create Course TypeScript interface in frontend/src/types/Course.ts
 
 ### Frontend UI Components & Pages
 
-- [ ] T088 [P] [US1] Create CourseForm.vue component in frontend/src/components/instructor/CourseForm.vue
-- [ ] T089 [P] [US1] Create SectionEditor.vue component in frontend/src/components/instructor/SectionEditor.vue
-- [ ] T090 [P] [US1] Create LessonUploader.vue component in frontend/src/components/instructor/LessonUploader.vue
-- [ ] T091 [US1] Create InstructorDashboard.vue page in frontend/src/views/Instructor/Dashboard.vue
-- [ ] T092 [US1] Create CreateCourse.vue page in frontend/src/views/Instructor/CreateCourse.vue
-- [ ] T093 [US1] Create EditCourse.vue page in frontend/src/views/Instructor/EditCourse.vue
-- [ ] T094 [US1] Add instructor routes to frontend/src/router/index.ts with instructor role guard
+- [x] T088 [P] [US1] Create CourseForm.vue component in frontend/src/components/instructor/CourseForm.vue
+- [x] T089 [P] [US1] Create SectionEditor.vue component in frontend/src/components/instructor/SectionEditor.vue
+- [x] T090 [P] [US1] Create LessonUploader.vue component in frontend/src/components/instructor/LessonUploader.vue
+- [x] T091 [US1] Create InstructorDashboard.vue page in frontend/src/views/Instructor/Dashboard.vue
+- [x] T092 [US1] Create CreateCourse.vue page in frontend/src/views/Instructor/CreateCourse.vue
+- [x] T093 [US1] Create EditCourse.vue page in frontend/src/views/Instructor/EditCourse.vue
+- [x] T094 [US1] Add instructor routes to frontend/src/router/index.ts with instructor role guard
 
 ### Integration & Validation
 

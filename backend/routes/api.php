@@ -3,6 +3,9 @@
 use App\Http\Controllers\Api\V1\Auth\LoginController;
 use App\Http\Controllers\Api\V1\Auth\PasswordResetController;
 use App\Http\Controllers\Api\V1\Auth\RegisterController;
+use App\Http\Controllers\Api\V1\Instructor\CourseController;
+use App\Http\Controllers\Api\V1\Instructor\LessonController;
+use App\Http\Controllers\Api\V1\Instructor\SectionController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -57,11 +60,28 @@ Route::middleware(['auth:sanctum'])->prefix('v1')->group(function () {
     Route::post('auth/logout', [LoginController::class, 'logout']);
     
     // Instructor routes
-    Route::prefix('instructor')->middleware(['role:instructor'])->group(function () {
-        // Will be implemented in User Story 1: Course Creation
-        // Route::resource('courses', CourseController::class);
-        // Route::resource('sections', SectionController::class);
-        // Route::resource('lessons', LessonController::class);
+    Route::prefix('instructor')->middleware([\App\Http\Middleware\EnsureInstructor::class])->group(function () {
+        // Course routes
+        Route::get('courses', [CourseController::class, 'index']);
+        Route::post('courses', [CourseController::class, 'store']);
+        Route::get('courses/{course}', [CourseController::class, 'show']);
+        Route::put('courses/{course}', [CourseController::class, 'update']);
+        Route::delete('courses/{course}', [CourseController::class, 'destroy']);
+        Route::post('courses/{course}/publish', [CourseController::class, 'publish']);
+        Route::post('courses/{course}/unpublish', [CourseController::class, 'unpublish']);
+
+        // Section routes (nested under courses)
+        Route::post('courses/{course}/sections', [SectionController::class, 'store']);
+        Route::put('courses/{course}/sections/{section}', [SectionController::class, 'update']);
+        Route::delete('courses/{course}/sections/{section}', [SectionController::class, 'destroy']);
+        Route::post('courses/{course}/sections/reorder', [SectionController::class, 'reorder']);
+
+        // Lesson routes (nested under courses and sections)
+        Route::post('courses/{course}/sections/{section}/lessons', [LessonController::class, 'store']);
+        Route::put('courses/{course}/sections/{section}/lessons/{lesson}', [LessonController::class, 'update']);
+        Route::delete('courses/{course}/sections/{section}/lessons/{lesson}', [LessonController::class, 'destroy']);
+        Route::post('courses/{course}/sections/{section}/lessons/{lesson}/upload-video', [LessonController::class, 'uploadVideo']);
+        Route::post('courses/{course}/sections/{section}/lessons/reorder', [LessonController::class, 'reorder']);
     });
     
     // Student routes  

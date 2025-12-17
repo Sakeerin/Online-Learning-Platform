@@ -2,10 +2,24 @@
 
 namespace App\Providers;
 
-use Illuminate\Support\ServiceProvider;
+use App\Events\CoursePublished;
+use App\Listeners\SendCoursePublishedNotification;
+use App\Models\Course;
+use App\Policies\CoursePolicy;
+use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
+use Illuminate\Support\Facades\Event;
 
 class AppServiceProvider extends ServiceProvider
 {
+    /**
+     * The policy mappings for the application.
+     *
+     * @var array<class-string, class-string>
+     */
+    protected $policies = [
+        Course::class => CoursePolicy::class,
+    ];
+
     /**
      * Register any application services.
      */
@@ -19,6 +33,12 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        $this->registerPolicies();
+
+        // Register event listeners
+        Event::listen(
+            CoursePublished::class,
+            SendCoursePublishedNotification::class
+        );
     }
 }
