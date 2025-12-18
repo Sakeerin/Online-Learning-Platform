@@ -119,6 +119,57 @@ const courseService = {
   async reorderLessons(courseId: string, sectionId: string, lessons: Array<{ id: string; order: number }>): Promise<void> {
     await api.post(`/instructor/courses/${courseId}/sections/${sectionId}/lessons/reorder`, { lessons })
   },
+
+  // Public course discovery endpoints (T109)
+  async browseCourses(params?: {
+    category?: string
+    subcategory?: string
+    difficulty_level?: string
+    min_price?: number
+    max_price?: number
+    free_only?: boolean
+    min_rating?: number
+    sort_by?: 'relevance' | 'price_asc' | 'price_desc' | 'rating' | 'enrollments' | 'newest'
+    page?: number
+    per_page?: number
+  }): Promise<PaginatedResponse<Course>> {
+    const response = await api.get<{ data: Course[]; meta: any }>('/courses', { params })
+    return {
+      data: response.data.data,
+      meta: response.data.meta,
+    }
+  },
+
+  async searchCourses(
+    query: string,
+    params?: {
+      category?: string
+      difficulty_level?: string
+      min_price?: number
+      max_price?: number
+      min_rating?: number
+      page?: number
+      per_page?: number
+    }
+  ): Promise<PaginatedResponse<Course>> {
+    const response = await api.get<{ data: Course[]; meta: any }>('/courses/search', {
+      params: { q: query, ...params },
+    })
+    return {
+      data: response.data.data,
+      meta: response.data.meta,
+    }
+  },
+
+  async getFeaturedCourses(): Promise<Course[]> {
+    const response = await api.get<{ data: Course[] }>('/courses/featured')
+    return response.data.data
+  },
+
+  async getPublicCourse(courseId: string): Promise<Course> {
+    const response = await api.get<{ data: Course }>(`/courses/${courseId}`)
+    return response.data.data
+  },
 }
 
 export default courseService

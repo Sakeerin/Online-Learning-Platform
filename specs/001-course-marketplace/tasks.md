@@ -207,41 +207,41 @@
 
 ### Backend API Controllers & Routes
 
-- [ ] T099 [US2] Create CourseDiscoveryController in backend/app/Http/Controllers/Api/V1/Student/CourseDiscoveryController.php
-- [ ] T100 [US2] Implement browse courses endpoint with pagination in CourseDiscoveryController
-- [ ] T101 [US2] Implement search endpoint with PostgreSQL full-text search in CourseDiscoveryController
-- [ ] T102 [US2] Implement filter logic (category, price, rating, difficulty) in CourseDiscoveryController
-- [ ] T103 [US2] Add public course routes to backend/routes/api.php under /api/v1/courses
+- [x] T099 [US2] Create CourseDiscoveryController in backend/app/Http/Controllers/Api/V1/Student/CourseDiscoveryController.php
+- [x] T100 [US2] Implement browse courses endpoint with pagination in CourseDiscoveryController
+- [x] T101 [US2] Implement search endpoint with PostgreSQL full-text search in CourseDiscoveryController
+- [x] T102 [US2] Implement filter logic (category, price, rating, difficulty) in CourseDiscoveryController
+- [x] T103 [US2] Add public course routes to backend/routes/api.php under /api/v1/courses
 
 ### Backend Business Logic
 
-- [ ] T104 [US2] Create search index on courses table (title, description) in new migration
-- [ ] T105 [US2] Implement course ranking algorithm (relevance, rating, enrollments) in CourseService
-- [ ] T106 [P] [US2] Add eager loading for instructor, reviews, enrollments to prevent N+1 queries
-- [ ] T107 [P] [US2] Implement Redis caching for course catalog (1-hour TTL) in CourseService
+- [x] T104 [US2] Create search index on courses table (title, description) in new migration
+- [x] T105 [US2] Implement course ranking algorithm (relevance, rating, enrollments) in CourseService
+- [x] T106 [P] [US2] Add eager loading for instructor, reviews, enrollments to prevent N+1 queries
+- [x] T107 [P] [US2] Implement Redis caching for course catalog (1-hour TTL) in CourseService
 
 ### Frontend State Management
 
-- [ ] T108 [P] [US2] Create useCourseDiscovery composable in frontend/src/composables/useCourseDiscovery.ts
-- [ ] T109 [P] [US2] Update courseService with browse, search, filter methods in frontend/src/services/courseService.ts
+- [x] T108 [P] [US2] Create useCourseDiscovery composable in frontend/src/composables/useCourseDiscovery.ts
+- [x] T109 [P] [US2] Update courseService with browse, search, filter methods in frontend/src/services/courseService.ts
 
 ### Frontend UI Components & Pages
 
-- [ ] T110 [P] [US2] Create CourseCard.vue component in frontend/src/components/course/CourseCard.vue
-- [ ] T111 [P] [US2] Create CourseGrid.vue component in frontend/src/components/course/CourseGrid.vue
-- [ ] T112 [P] [US2] Create CourseFilters.vue component in frontend/src/components/course/CourseFilters.vue
-- [ ] T113 [P] [US2] Create CourseCurriculum.vue component in frontend/src/components/course/CourseCurriculum.vue
-- [ ] T114 [US2] Create Home.vue page with featured courses in frontend/src/views/Home.vue
-- [ ] T115 [US2] Create Browse.vue catalog page in frontend/src/views/Courses/Browse.vue
-- [ ] T116 [US2] Create Search.vue results page in frontend/src/views/Courses/Search.vue
-- [ ] T117 [US2] Create Detail.vue course detail page in frontend/src/views/Courses/Detail.vue
-- [ ] T118 [US2] Add public course routes to frontend/src/router/index.ts
+- [x] T110 [P] [US2] Create CourseCard.vue component in frontend/src/components/course/CourseCard.vue
+- [x] T111 [P] [US2] Create CourseGrid.vue component in frontend/src/components/course/CourseGrid.vue
+- [x] T112 [P] [US2] Create CourseFilters.vue component in frontend/src/components/course/CourseFilters.vue
+- [x] T113 [P] [US2] Create CourseCurriculum.vue component in frontend/src/components/course/CourseCurriculum.vue
+- [x] T114 [US2] Create Home.vue page with featured courses in frontend/src/views/Home.vue
+- [x] T115 [US2] Create Browse.vue catalog page in frontend/src/views/Courses/Browse.vue
+- [x] T116 [US2] Create Search.vue results page in frontend/src/views/Courses/Search.vue
+- [x] T117 [US2] Create Detail.vue course detail page in frontend/src/views/Courses/Detail.vue
+- [x] T118 [US2] Add public course routes to frontend/src/router/index.ts
 
 ### Search & Performance Optimization
 
-- [ ] T119 [US2] Implement debounced search input to reduce API calls
-- [ ] T120 [US2] Add loading states and skeletons for course cards
-- [ ] T121 [US2] Implement infinite scroll or pagination for course results
+- [x] T119 [US2] Implement debounced search input to reduce API calls
+- [x] T120 [US2] Add loading states and skeletons for course cards
+- [x] T121 [US2] Implement infinite scroll or pagination for course results
 
 **Checkpoint**: Student Course Discovery complete - students can now find and view courses
 

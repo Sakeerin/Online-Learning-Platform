@@ -56,6 +56,26 @@ const routes: Array<RouteRecordRaw> = [
         component: () => import('../views/Student/MyLearning.vue')
       }
     ]
+  },
+  {
+    path: '/courses',
+    children: [
+      {
+        path: 'browse',
+        name: 'browse-courses',
+        component: () => import('../views/Courses/Browse.vue')
+      },
+      {
+        path: 'search',
+        name: 'search-courses',
+        component: () => import('../views/Courses/Search.vue')
+      },
+      {
+        path: ':id',
+        name: 'course-detail',
+        component: () => import('../views/Courses/Detail.vue')
+      }
+    ]
   }
 ]
 

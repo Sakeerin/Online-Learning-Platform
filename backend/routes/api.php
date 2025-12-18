@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\V1\Auth\RegisterController;
 use App\Http\Controllers\Api\V1\Instructor\CourseController;
 use App\Http\Controllers\Api\V1\Instructor\LessonController;
 use App\Http\Controllers\Api\V1\Instructor\SectionController;
+use App\Http\Controllers\Api\V1\Student\CourseDiscoveryController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -41,9 +42,10 @@ Route::prefix('v1')->group(function () {
 
     // Public course discovery routes
     Route::prefix('courses')->group(function () {
-        // Will be implemented in User Story 2: Course Discovery
-        // Route::get('/', [CourseDiscoveryController::class, 'index']);
-        // Route::get('/{id}', [CourseDiscoveryController::class, 'show']);
+        Route::get('/', [CourseDiscoveryController::class, 'index']);
+        Route::get('/featured', [CourseDiscoveryController::class, 'featured']);
+        Route::get('/search', [CourseDiscoveryController::class, 'search']);
+        Route::get('/{id}', [CourseDiscoveryController::class, 'show']);
     });
 
     // Certificate verification (public)

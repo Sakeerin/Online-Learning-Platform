@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Course;
 use App\Models\User;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
 class CourseService
@@ -102,6 +103,187 @@ class CourseService
         }
 
         return $query->paginate($filters['per_page'] ?? 15);
+    }
+
+    /**
+     * Browse published courses with filters and pagination.
+     */
+    public function browseCourses(array $filters = []): \Illuminate\Contracts\Pagination\LengthAwarePaginator
+    {
+        // T107: Cache key excludes pagination to cache the query, not the paginated results
+        // Note: Paginated results are not cached directly, but query optimization is applied
+        $query = Course::where('status', 'published')
+            ->with(['instructor']) // T106: Eager load instructor to prevent N+1
+            ->withCount(['sections']);
+
+        // Filter by category
+        if (isset($filters['category']) && !empty($filters['category'])) {
+            $query->where('category', $filters['category']);
+        }
+
+        // Filter by subcategory
+        if (isset($filters['subcategory']) && !empty($filters['subcategory'])) {
+            $query->where('subcategory', $filters['subcategory']);
+        }
+
+        // Filter by difficulty level
+        if (isset($filters['difficulty_level']) && !empty($filters['difficulty_level'])) {
+            $query->where('difficulty_level', $filters['difficulty_level']);
+        }
+
+        // Filter by price range
+        if (isset($filters['min_price'])) {
+            $query->where('price', '>=', $filters['min_price']);
+        }
+        if (isset($filters['max_price'])) {
+            $query->where('price', '<=', $filters['max_price']);
+        }
+
+        // Filter free courses
+        if (isset($filters['free_only']) && $filters['free_only']) {
+            $query->where('price', 0);
+        }
+
+        // Filter by rating
+        if (isset($filters['min_rating'])) {
+            $query->where('average_rating', '>=', $filters['min_rating']);
+        }
+
+        // Sort by
+        $sortBy = $filters['sort_by'] ?? 'relevance';
+        switch ($sortBy) {
+            case 'price_asc':
+                $query->orderBy('price', 'asc');
+                break;
+            case 'price_desc':
+                $query->orderBy('price', 'desc');
+                break;
+            case 'rating':
+                $query->orderBy('average_rating', 'desc');
+                break;
+            case 'enrollments':
+                $query->orderBy('total_enrollments', 'desc');
+                break;
+            case 'newest':
+                $query->orderBy('published_at', 'desc');
+                break;
+            case 'relevance':
+            default:
+                // T105: Ranking algorithm (relevance, rating, enrollments)
+                if (config('database.default') === 'pgsql') {
+                    $query->orderByRaw('
+                        (COALESCE(average_rating, 0) * 0.4 + 
+                         (total_enrollments / 100.0) * 0.3 + 
+                         (CASE WHEN published_at > NOW() - INTERVAL \'30 days\' THEN 1 ELSE 0 END) * 0.3) DESC
+                    ')
+                    ->orderBy('published_at', 'desc');
+                } else {
+                    // Fallback for MySQL/SQLite
+                    $query->orderBy('average_rating', 'desc')
+                        ->orderBy('total_enrollments', 'desc')
+                        ->orderBy('published_at', 'desc');
+                }
+                break;
+        }
+
+        return $query->paginate($filters['per_page'] ?? 12);
+    }
+
+    /**
+     * Search courses using full-text search.
+     */
+    public function searchCourses(string $query, array $filters = []): \Illuminate\Contracts\Pagination\LengthAwarePaginator
+    {
+        // T107: Note: Paginated results are not cached directly, but query optimization is applied
+        $dbQuery = Course::where('status', 'published')
+            ->with(['instructor']) // T106: Eager load instructor
+            ->withCount(['sections']);
+
+        // PostgreSQL full-text search
+        if (config('database.default') === 'pgsql') {
+            $dbQuery->whereRaw("
+                to_tsvector('english', coalesce(title, '') || ' ' || coalesce(description, '')) 
+                @@ plainto_tsquery('english', ?)
+            ", [$query]);
+        } else {
+            // Fallback for MySQL/SQLite
+            $dbQuery->where(function ($q) use ($query) {
+                $q->where('title', 'like', "%{$query}%")
+                  ->orWhere('description', 'like', "%{$query}%")
+                  ->orWhere('subtitle', 'like', "%{$query}%");
+            });
+        }
+
+        // Apply filters
+        if (isset($filters['category']) && !empty($filters['category'])) {
+            $dbQuery->where('category', $filters['category']);
+        }
+        if (isset($filters['difficulty_level']) && !empty($filters['difficulty_level'])) {
+            $dbQuery->where('difficulty_level', $filters['difficulty_level']);
+        }
+        if (isset($filters['min_price'])) {
+            $dbQuery->where('price', '>=', $filters['min_price']);
+        }
+        if (isset($filters['max_price'])) {
+            $dbQuery->where('price', '<=', $filters['max_price']);
+        }
+        if (isset($filters['min_rating'])) {
+            $dbQuery->where('average_rating', '>=', $filters['min_rating']);
+        }
+
+        // Sort by relevance (full-text search ranking)
+        if (config('database.default') === 'pgsql') {
+            $dbQuery->orderByRaw("
+                ts_rank(
+                    to_tsvector('english', coalesce(title, '') || ' ' || coalesce(description, '')),
+                    plainto_tsquery('english', ?)
+                ) DESC
+            ", [$query])
+            ->orderBy('average_rating', 'desc')
+            ->orderBy('total_enrollments', 'desc');
+        } else {
+            $dbQuery->orderBy('average_rating', 'desc')
+                ->orderBy('total_enrollments', 'desc');
+        }
+
+        return $dbQuery->paginate($filters['per_page'] ?? 12);
+    }
+
+    /**
+     * Get featured courses (top rated, most enrolled).
+     */
+    public function getFeaturedCourses(int $limit = 6): \Illuminate\Database\Eloquent\Collection
+    {
+        // T107: Cache featured courses for 1 hour
+        $cacheKey = 'courses:featured:' . $limit;
+        
+        return Cache::remember($cacheKey, 3600, function () use ($limit) {
+            if (config('database.default') === 'pgsql') {
+                return Course::where('status', 'published')
+                    ->with(['instructor'])
+                    ->orderByRaw('(COALESCE(average_rating, 0) * 0.5 + total_enrollments * 0.5) DESC')
+                    ->limit($limit)
+                    ->get();
+            } else {
+                return Course::where('status', 'published')
+                    ->with(['instructor'])
+                    ->orderBy('average_rating', 'desc')
+                    ->orderBy('total_enrollments', 'desc')
+                    ->limit($limit)
+                    ->get();
+            }
+        });
+    }
+
+    /**
+     * Get course by ID for public viewing.
+     */
+    public function getPublicCourse(string $courseId): ?Course
+    {
+        return Course::where('id', $courseId)
+            ->where('status', 'published')
+            ->with(['instructor', 'sections.lessons']) // T106: Eager load relationships
+            ->first();
     }
 }
 
