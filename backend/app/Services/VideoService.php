@@ -36,7 +36,7 @@ class VideoService
     }
 
     /**
-     * Generate signed CloudFront URL for video playback
+     * T139: Generate signed CloudFront URL for authenticated video access
      */
     public function generatePlaybackUrl(string $videoPath, int $expirationHours = 24): string
     {
@@ -46,7 +46,16 @@ class VideoService
         }
 
         // For production with CloudFront, generate signed URL
-        // This would use AWS CloudFront signed URLs
+        // T139: This would use AWS CloudFront signed URLs with private key
+        // Example implementation:
+        // $cloudFrontUrl = config('services.cloudfront.url') . '/' . $videoPath;
+        // $expires = time() + ($expirationHours * 3600);
+        // $signer = new CloudFrontUrlSigner(
+        //     config('services.cloudfront.key_pair_id'),
+        //     config('services.cloudfront.private_key_path')
+        // );
+        // return $signer->getSignedUrl($cloudFrontUrl, $expires);
+        
         // For now, return S3 URL (in production, use CloudFront distribution URL)
         return Storage::disk('s3')->url($videoPath);
     }

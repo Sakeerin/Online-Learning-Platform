@@ -87,10 +87,21 @@ Route::middleware(['auth:sanctum'])->prefix('v1')->group(function () {
     });
     
     // Student routes  
-    Route::prefix('student')->middleware(['role:student'])->group(function () {
-        // Will be implemented in User Story 3: Enrollment & Learning
-        // Route::resource('enrollments', EnrollmentController::class);
-        // Route::post('enrollments/{enrollment}/lessons/{lesson}/progress', [ProgressController::class, 'update']);
+    Route::prefix('student')->middleware([\App\Http\Middleware\EnsureStudent::class])->group(function () {
+        // Enrollment routes
+        Route::get('enrollments', [\App\Http\Controllers\Api\V1\Student\EnrollmentController::class, 'index']);
+        Route::post('enrollments', [\App\Http\Controllers\Api\V1\Student\EnrollmentController::class, 'store']);
+        Route::get('enrollments/{enrollment}', [\App\Http\Controllers\Api\V1\Student\EnrollmentController::class, 'show']);
+
+        // Learning routes
+        Route::get('courses/{course}/learning', [\App\Http\Controllers\Api\V1\Student\LearningController::class, 'getCourseLearning']);
+        Route::get('courses/{course}/lessons/{lesson}/video-url', [\App\Http\Controllers\Api\V1\Student\LearningController::class, 'getVideoUrl']);
+
+        // Progress routes
+        Route::get('enrollments/{enrollment}/progress', [\App\Http\Controllers\Api\V1\Student\ProgressController::class, 'index']);
+        Route::get('enrollments/{enrollment}/lessons/{lesson}/progress', [\App\Http\Controllers\Api\V1\Student\ProgressController::class, 'show']);
+        Route::put('enrollments/{enrollment}/lessons/{lesson}/progress/position', [\App\Http\Controllers\Api\V1\Student\ProgressController::class, 'updatePosition']);
+        Route::post('enrollments/{enrollment}/lessons/{lesson}/progress/complete', [\App\Http\Controllers\Api\V1\Student\ProgressController::class, 'markComplete']);
     });
     
     // Payment routes

@@ -17,11 +17,10 @@ class EnsureStudent
     {
         if (!$request->user() || !$request->user()->isStudent()) {
             return response()->json([
-                'message' => 'This action requires student privileges.',
+                'message' => 'Unauthorized. Student access required.',
             ], 403);
         }
 
         return $next($request);
     }
 }
-

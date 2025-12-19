@@ -1,0 +1,300 @@
+<script setup lang="ts">
+import { ref, computed, onMounted } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import { useEnrollment } from '@/composables/useEnrollment'
+import enrollmentService from '@/services/enrollmentService'
+import LessonPlayer from '@/components/student/LessonPlayer.vue'
+import CourseProgress from '@/components/course/CourseProgress.vue'
+import Card from '@/components/common/Card.vue'
+import type { Section, Lesson } from '@/types/Course'
+
+const route = useRoute()
+const router = useRouter()
+const courseId = route.params.courseId as string
+const lessonId = route.query.lesson as string | undefined
+
+const { currentEnrollment, fetchEnrollment } = useEnrollment()
+const courseData = ref<any>(null)
+const currentLesson = ref<Lesson | null>(null)
+const currentSection = ref<Section | null>(null)
+const isLoading = ref(false)
+const error = ref<string | null>(null)
+
+const sections = computed(() => courseData.value?.sections || [])
+const enrollment = computed(() => courseData.value?.enrollment)
+
+// Find next and previous lessons
+const nextLesson = computed(() => {
+  if (!currentLesson.value || !sections.value.length) return null
+
+  const allLessons: Array<{ lesson: Lesson; section: Section }> = []
+  sections.value.forEach((section: Section) => {
+    section.lessons?.forEach((lesson: Lesson) => {
+      allLessons.push({ lesson, section })
+    })
+  })
+
+  const currentIndex = allLessons.findIndex((item) => item.lesson.id === currentLesson.value?.id)
+  if (currentIndex < allLessons.length - 1) {
+    return allLessons[currentIndex + 1].lesson
+  }
+  return null
+})
+
+const previousLesson = computed(() => {
+  if (!currentLesson.value || !sections.value.length) return null
+
+  const allLessons: Array<{ lesson: Lesson; section: Section }> = []
+  sections.value.forEach((section: Section) => {
+    section.lessons?.forEach((lesson: Lesson) => {
+      allLessons.push({ lesson, section })
+    })
+  })
+
+  const currentIndex = allLessons.findIndex((item) => item.lesson.id === currentLesson.value?.id)
+  if (currentIndex > 0) {
+    return allLessons[currentIndex - 1].lesson
+  }
+  return null
+})
+
+onMounted(async () => {
+  await loadCourseData()
+  
+  if (lessonId) {
+    selectLesson(lessonId)
+  } else {
+    // Select first lesson
+    const firstSection = sections.value[0]
+    if (firstSection?.lessons?.[0]) {
+      selectLesson(firstSection.lessons[0].id)
+    }
+  }
+})
+
+const loadCourseData = async () => {
+  isLoading.value = true
+  error.value = null
+
+  try {
+    const data = await enrollmentService.getCourseLearning(courseId)
+    courseData.value = data
+
+    // Update enrollment in store
+    if (data.enrollment) {
+      await fetchEnrollment(data.enrollment.id)
+    }
+  } catch (err: any) {
+    error.value = err.response?.data?.message || 'Failed to load course'
+    if (err.response?.status === 403) {
+      router.push({ name: 'course-detail', params: { id: courseId } })
+    }
+  } finally {
+    isLoading.value = false
+  }
+}
+
+const selectLesson = (lessonId: string) => {
+  for (const section of sections.value) {
+    const lesson = section.lessons?.find((l: Lesson) => l.id === lessonId)
+    if (lesson) {
+      currentLesson.value = lesson
+      currentSection.value = section
+      router.replace({
+        query: { ...route.query, lesson: lessonId },
+      })
+      return
+    }
+  }
+}
+
+const handleLessonComplete = () => {
+  // T161: Auto-load next lesson on completion
+  if (nextLesson.value) {
+    selectLesson(nextLesson.value.id)
+  }
+}
+
+const handleNextLesson = () => {
+  if (nextLesson.value) {
+    selectLesson(nextLesson.value.id)
+  }
+}
+</script>
+
+<template>
+  <div class="course-player">
+    <div v-if="isLoading" class="loading">Loading course...</div>
+    <div v-else-if="error" class="error">{{ error }}</div>
+    <div v-else-if="courseData && enrollment" class="player-container">
+      <div class="player-main">
+        <LessonPlayer
+          v-if="currentLesson && currentSection"
+          :enrollment-id="enrollment.id"
+          :course-id="courseId"
+          :lesson="currentLesson"
+          :section="currentSection"
+          :next-lesson="nextLesson || undefined"
+          @lesson-complete="handleLessonComplete"
+          @next-lesson="handleNextLesson"
+        />
+      </div>
+
+      <div class="player-sidebar">
+        <CourseProgress v-if="enrollment" :enrollment="enrollment" />
+
+        <Card title="Course Content" class="curriculum-card">
+          <div class="sections-list">
+            <div
+              v-for="section in sections"
+              :key="section.id"
+              class="section-item"
+              :class="{ active: section.id === currentSection?.id }"
+            >
+              <h4 class="section-title">{{ section.title }}</h4>
+              <div class="lessons-list">
+                <button
+                  v-for="lesson in section.lessons"
+                  :key="lesson.id"
+                  :class="['lesson-item', { active: lesson.id === currentLesson?.id }]"
+                  @click="selectLesson(lesson.id)"
+                >
+                  <span class="lesson-type">{{ lesson.type }}</span>
+                  <span class="lesson-title">{{ lesson.title }}</span>
+                  <span v-if="lesson.progress?.is_completed" class="completed-badge">✓</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </Card>
+      </div>
+    </div>
+  </div>
+</template>
+
+<style scoped>
+.course-player {
+  min-height: 100vh;
+  padding: 2rem 0;
+  background: #f9fafb;
+}
+
+.loading,
+.error {
+  text-align: center;
+  padding: 4rem 2rem;
+  font-size: 1.25rem;
+}
+
+.error {
+  color: var(--error);
+}
+
+.player-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+  display: grid;
+  grid-template-columns: 1fr 400px;
+  gap: 2rem;
+}
+
+.player-main {
+  min-width: 0;
+}
+
+.player-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  position: sticky;
+  top: 2rem;
+  height: fit-content;
+}
+
+.curriculum-card {
+  max-height: 600px;
+  overflow-y: auto;
+}
+
+.sections-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.section-item {
+  border-left: 3px solid transparent;
+  padding-left: 1rem;
+}
+
+.section-item.active {
+  border-left-color: var(--primary-color);
+}
+
+.section-title {
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 0 0 0.75rem 0;
+}
+
+.lessons-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.lesson-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  background: none;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.2s;
+}
+
+.lesson-item:hover {
+  background: #f3f4f6;
+}
+
+.lesson-item.active {
+  background: #e0e7ff;
+  color: var(--primary-color);
+  font-weight: 600;
+}
+
+.lesson-type {
+  padding: 0.25rem 0.5rem;
+  background: #e0e7ff;
+  color: #6366f1;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.lesson-title {
+  flex: 1;
+  font-size: 0.875rem;
+}
+
+.completed-badge {
+  color: #10b981;
+  font-weight: 700;
+}
+
+@media (max-width: 1024px) {
+  .player-container {
+    grid-template-columns: 1fr;
+  }
+
+  .player-sidebar {
+    position: static;
+  }
+}
+</style>
+

@@ -255,67 +255,67 @@
 
 ### Backend Models & Database
 
-- [ ] T122 [P] [US3] Create Enrollment model in backend/app/Models/Enrollment.php
-- [ ] T123 [P] [US3] Create Progress model in backend/app/Models/Progress.php
-- [ ] T124 [P] [US3] Create EnrollmentFactory in backend/database/factories/EnrollmentFactory.php
+- [x] T122 [P] [US3] Create Enrollment model in backend/app/Models/Enrollment.php
+- [x] T123 [P] [US3] Create Progress model in backend/app/Models/Progress.php
+- [x] T124 [P] [US3] Create EnrollmentFactory in backend/database/factories/EnrollmentFactory.php
 
 ### Backend Business Logic
 
-- [ ] T125 [US3] Create EnrollmentService with enroll, checkAccess methods in backend/app/Services/EnrollmentService.php
-- [ ] T126 [US3] Create ProgressService with updatePosition, markComplete methods in backend/app/Services/ProgressService.php
-- [ ] T127 [US3] Create CalculateProgressAction for enrollment progress percentage in backend/app/Actions/CalculateProgressAction.php
-- [ ] T128 [P] [US3] Create EnrollmentPolicy for authorization in backend/app/Policies/EnrollmentPolicy.php
-- [ ] T129 [P] [US3] Create EnrollmentRequest form validation in backend/app/Http/Requests/EnrollmentRequest.php
+- [x] T125 [US3] Create EnrollmentService with enroll, checkAccess methods in backend/app/Services/EnrollmentService.php
+- [x] T126 [US3] Create ProgressService with updatePosition, markComplete methods in backend/app/Services/ProgressService.php
+- [x] T127 [US3] Create CalculateProgressAction for enrollment progress percentage in backend/app/Actions/CalculateProgressAction.php
+- [x] T128 [P] [US3] Create EnrollmentPolicy for authorization in backend/app/Policies/EnrollmentPolicy.php
+- [x] T129 [P] [US3] Create EnrollmentRequest form validation in backend/app/Http/Requests/EnrollmentRequest.php
 
 ### Backend API Controllers & Routes
 
-- [ ] T130 [US3] Create EnrollmentController in backend/app/Http/Controllers/Api/V1/Student/EnrollmentController.php
-- [ ] T131 [US3] Create LearningController for video playback in backend/app/Http/Controllers/Api/V1/Student/LearningController.php
-- [ ] T132 [US3] Create ProgressController for lesson tracking in backend/app/Http/Controllers/Api/V1/Student/ProgressController.php
-- [ ] T133 [P] [US3] Create EnrollmentResource in backend/app/Http/Resources/EnrollmentResource.php
-- [ ] T134 [US3] Add student enrollment routes to backend/routes/api.php under /api/v1/student/enrollments
+- [x] T130 [US3] Create EnrollmentController in backend/app/Http/Controllers/Api/V1/Student/EnrollmentController.php
+- [x] T131 [US3] Create LearningController for video playback in backend/app/Http/Controllers/Api/V1/Student/LearningController.php
+- [x] T132 [US3] Create ProgressController for lesson tracking in backend/app/Http/Controllers/Api/V1/Student/ProgressController.php
+- [x] T133 [P] [US3] Create EnrollmentResource in backend/app/Http/Resources/EnrollmentResource.php
+- [x] T134 [US3] Add student enrollment routes to backend/routes/api.php under /api/v1/student/enrollments
 
 ### Backend Events & Jobs
 
-- [ ] T135 [P] [US3] Create StudentEnrolled event in backend/app/Events/StudentEnrolled.php
-- [ ] T136 [P] [US3] Create LessonCompleted event in backend/app/Events/LessonCompleted.php
-- [ ] T137 [P] [US3] Create SendEnrollmentConfirmation listener in backend/app/Listeners/SendEnrollmentConfirmation.php
-- [ ] T138 [P] [US3] Create UpdateCourseProgress listener in backend/app/Listeners/UpdateCourseProgress.php
+- [x] T135 [P] [US3] Create StudentEnrolled event in backend/app/Events/StudentEnrolled.php
+- [x] T136 [P] [US3] Create LessonCompleted event in backend/app/Events/LessonCompleted.php
+- [x] T137 [P] [US3] Create SendEnrollmentConfirmation listener in backend/app/Listeners/SendEnrollmentConfirmation.php
+- [x] T138 [P] [US3] Create UpdateCourseProgress listener in backend/app/Listeners/UpdateCourseProgress.php
 
 ### Video Streaming & Security
 
-- [ ] T139 [US3] Implement signed CloudFront URL generation for authenticated video access in VideoService
-- [ ] T140 [US3] Create endpoint to generate video playback URL with 24-hour expiration
-- [ ] T141 [US3] Verify enrolled users can access videos, non-enrolled users get 403
+- [x] T139 [US3] Implement signed CloudFront URL generation for authenticated video access in VideoService
+- [x] T140 [US3] Create endpoint to generate video playback URL with 24-hour expiration
+- [x] T141 [US3] Verify enrolled users can access videos, non-enrolled users get 403
 
 ### Frontend State Management
 
-- [ ] T142 [US3] Create enrollment store in frontend/src/stores/enrollment.ts
-- [ ] T143 [US3] Create progress store in frontend/src/stores/progress.ts
-- [ ] T144 [P] [US3] Create useEnrollment composable in frontend/src/composables/useEnrollment.ts
-- [ ] T145 [P] [US3] Create useVideoPlayer composable in frontend/src/composables/useVideoPlayer.ts
-- [ ] T146 [P] [US3] Create enrollmentService API client in frontend/src/services/enrollmentService.ts
-- [ ] T147 [P] [US3] Create Enrollment TypeScript interface in frontend/src/types/Enrollment.ts
+- [x] T142 [US3] Create enrollment store in frontend/src/stores/enrollment.ts
+- [x] T143 [US3] Create progress store in frontend/src/stores/progress.ts
+- [x] T144 [P] [US3] Create useEnrollment composable in frontend/src/composables/useEnrollment.ts
+- [x] T145 [P] [US3] Create useVideoPlayer composable in frontend/src/composables/useVideoPlayer.ts
+- [x] T146 [P] [US3] Create enrollmentService API client in frontend/src/services/enrollmentService.ts
+- [x] T147 [P] [US3] Create Enrollment TypeScript interface in frontend/src/types/Enrollment.ts
 
 ### Frontend UI Components & Pages
 
-- [ ] T148 [P] [US3] Create VideoPlayer.vue component with controls in frontend/src/components/common/VideoPlayer.vue
-- [ ] T149 [P] [US3] Create EnrollmentButton.vue component in frontend/src/components/student/EnrollmentButton.vue
-- [ ] T150 [P] [US3] Create LessonPlayer.vue component in frontend/src/components/student/LessonPlayer.vue
-- [ ] T151 [P] [US3] Create ProgressBar.vue component in frontend/src/components/student/ProgressBar.vue
-- [ ] T152 [P] [US3] Create CourseProgress.vue component in frontend/src/components/course/CourseProgress.vue
-- [ ] T153 [US3] Create MyLearning.vue page in frontend/src/views/Student/MyLearning.vue
-- [ ] T154 [US3] Create CoursePlayer.vue learning interface in frontend/src/views/Student/CoursePlayer.vue
-- [ ] T155 [US3] Add student routes to frontend/src/router/index.ts with authentication guard
+- [x] T148 [P] [US3] Create VideoPlayer.vue component with controls in frontend/src/components/common/VideoPlayer.vue
+- [x] T149 [P] [US3] Create EnrollmentButton.vue component in frontend/src/components/student/EnrollmentButton.vue
+- [x] T150 [P] [US3] Create LessonPlayer.vue component in frontend/src/components/student/LessonPlayer.vue
+- [x] T151 [P] [US3] Create ProgressBar.vue component in frontend/src/components/student/ProgressBar.vue
+- [x] T152 [P] [US3] Create CourseProgress.vue component in frontend/src/components/course/CourseProgress.vue
+- [x] T153 [US3] Create MyLearning.vue page in frontend/src/views/Student/MyLearning.vue
+- [x] T154 [US3] Create CoursePlayer.vue learning interface in frontend/src/views/Student/CoursePlayer.vue
+- [x] T155 [US3] Add student routes to frontend/src/router/index.ts with authentication guard
 
 ### Video Player Features
 
-- [ ] T156 [US3] Implement play/pause, volume controls, playback speed selector in VideoPlayer
-- [ ] T157 [US3] Implement fullscreen mode and keyboard shortcuts (Space for play/pause)
-- [ ] T158 [US3] Implement video position save on pause/navigation (debounced API call every 10s)
-- [ ] T159 [US3] Implement resume from saved position on video load
-- [ ] T160 [US3] Auto-mark lesson complete when video reaches 95% watched
-- [ ] T161 [US3] Implement "Next Lesson" auto-load on completion
+- [x] T156 [US3] Implement play/pause, volume controls, playback speed selector in VideoPlayer
+- [x] T157 [US3] Implement fullscreen mode and keyboard shortcuts (Space for play/pause)
+- [x] T158 [US3] Implement video position save on pause/navigation (debounced API call every 10s)
+- [x] T159 [US3] Implement resume from saved position on video load
+- [x] T160 [US3] Auto-mark lesson complete when video reaches 95% watched
+- [x] T161 [US3] Implement "Next Lesson" auto-load on completion
 
 **Checkpoint**: Course Enrollment & Video Learning complete - MVP DELIVERED! Students can now enroll and learn from courses.
 

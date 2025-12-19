@@ -1,18 +1,25 @@
 <script setup lang="ts">
-import { onMounted, computed } from 'vue'
+import { onMounted, computed, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import { useCourseDiscovery } from '@/composables/useCourseDiscovery'
+import { useEnrollment } from '@/composables/useEnrollment'
 import CourseCurriculum from '@/components/course/CourseCurriculum.vue'
+import EnrollmentButton from '@/components/student/EnrollmentButton.vue'
 import Card from '@/components/common/Card.vue'
-import Button from '@/components/common/Button.vue'
 
 const route = useRoute()
 const courseId = route.params.id as string
 
 const { currentCourse, fetchCourse, isLoading, error } = useCourseDiscovery()
+const { enrollments, fetchEnrollments } = useEnrollment()
+const isEnrolled = ref(false)
 
 onMounted(async () => {
   await fetchCourse(courseId)
+  await fetchEnrollments()
+  
+  // Check if user is enrolled
+  isEnrolled.value = enrollments.value.some((e) => e.course_id === courseId)
 })
 
 const formattedPrice = computed(() => {
@@ -64,7 +71,13 @@ const ratingDisplay = computed(() => {
           <Card>
             <div class="purchase-card">
               <div class="price">{{ formattedPrice }}</div>
-              <Button size="lg" class="enroll-button">Enroll Now</Button>
+              <EnrollmentButton
+                :course-id="courseId"
+                :price="currentCourse.price"
+                :currency="currentCourse.currency"
+                :is-enrolled="isEnrolled"
+                @enrolled="isEnrolled = true"
+              />
               <ul class="course-features">
                 <li>Full lifetime access</li>
                 <li>Certificate of completion</li>

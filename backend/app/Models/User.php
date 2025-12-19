@@ -83,4 +83,12 @@ class User extends Authenticatable
     {
         return $this->hasMany(\App\Models\Course::class, 'instructor_id');
     }
+
+    /**
+     * Get the enrollments for the student.
+     */
+    public function enrollments(): HasMany
+    {
+        return $this->hasMany(\App\Models\Enrollment::class, 'user_id');
+    }
 }
