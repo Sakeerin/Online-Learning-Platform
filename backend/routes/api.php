@@ -6,6 +6,9 @@ use App\Http\Controllers\Api\V1\Auth\RegisterController;
 use App\Http\Controllers\Api\V1\Instructor\CourseController;
 use App\Http\Controllers\Api\V1\Instructor\LessonController;
 use App\Http\Controllers\Api\V1\Instructor\SectionController;
+use App\Http\Controllers\Api\V1\Payment\CheckoutController;
+use App\Http\Controllers\Api\V1\Payment\RefundController;
+use App\Http\Controllers\Api\V1\Payment\WebhookController;
 use App\Http\Controllers\Api\V1\Student\CourseDiscoveryController;
 use Illuminate\Support\Facades\Route;
 
@@ -106,14 +109,15 @@ Route::middleware(['auth:sanctum'])->prefix('v1')->group(function () {
     
     // Payment routes
     Route::prefix('payment')->group(function () {
-        // Will be implemented in User Story 4: Payments
-        // Route::post('checkout', [CheckoutController::class, 'create']);
+        Route::post('checkout', [CheckoutController::class, 'create']);
+        Route::post('verify', [CheckoutController::class, 'verify']);
+        Route::get('transactions/{transaction}/refund/eligibility', [RefundController::class, 'eligibility']);
+        Route::post('transactions/{transaction}/refund', [RefundController::class, 'request']);
     });
 });
 
 // Webhook routes (for external services like Stripe)
-Route::post('webhooks/stripe', function () {
-    // Will be implemented in User Story 4: Payments
-    return response()->json(['message' => 'Stripe webhook endpoint']);
-});
+// Note: Webhooks should not use CSRF protection
+Route::post('webhooks/stripe', [WebhookController::class, 'handle'])
+    ->middleware(\Illuminate\Http\Middleware\ValidatePostSize::class);
 

@@ -81,6 +81,22 @@ const routes: Array<RouteRecordRaw> = [
         component: () => import('../views/Courses/Detail.vue')
       }
     ]
+  },
+  {
+    path: '/payment',
+    meta: { requiresAuth: true, requiresStudent: true },
+    children: [
+      {
+        path: 'checkout',
+        name: 'checkout',
+        component: () => import('../views/Payment/Checkout.vue')
+      },
+      {
+        path: 'success',
+        name: 'payment-success',
+        component: () => import('../views/Payment/Success.vue')
+      }
+    ]
   }
 ]
 

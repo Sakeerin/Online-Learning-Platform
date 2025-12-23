@@ -77,6 +77,14 @@ class Course extends Model
     }
 
     /**
+     * Get the transactions for the course.
+     */
+    public function transactions(): HasMany
+    {
+        return $this->hasMany(Transaction::class);
+    }
+
+    /**
      * Check if course is published.
      */
     public function isPublished(): bool

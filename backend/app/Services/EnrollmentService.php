@@ -30,12 +30,17 @@ class EnrollmentService
                 throw new \Exception('Cannot enroll in unpublished course.');
             }
 
-            // Check if course is free or requires payment
-            // For now, allow enrollment in free courses
-            // Payment check will be added in Phase 6
+            // Check if course requires payment
             if ($course->price > 0) {
-                // In Phase 6, this will check for valid transaction
-                // For now, we'll allow enrollment (payment will be validated later)
+                // Check for valid completed transaction
+                $transaction = \App\Models\Transaction::where('user_id', $student->id)
+                    ->where('course_id', $course->id)
+                    ->where('status', 'completed')
+                    ->first();
+
+                if (!$transaction) {
+                    throw new \Exception('Payment required to enroll in this course.');
+                }
             }
 
             $enrollment = Enrollment::create([

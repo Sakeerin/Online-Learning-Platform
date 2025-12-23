@@ -91,4 +91,12 @@ class User extends Authenticatable
     {
         return $this->hasMany(\App\Models\Enrollment::class, 'user_id');
     }
+
+    /**
+     * Get the transactions for the user.
+     */
+    public function transactions(): HasMany
+    {
+        return $this->hasMany(\App\Models\Transaction::class, 'user_id');
+    }
 }

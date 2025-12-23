@@ -321,7 +321,7 @@
 
 ---
 
-## Phase 6: User Story 4 - Payment & Transactions (Priority: P2)
+## Phase 6: User Story 4 - Payment & Transactions (Priority: P2) ✅ COMPLETE
 
 **Goal**: Enable paid course purchases via Stripe with instructor revenue tracking
 
@@ -329,57 +329,61 @@
 
 ### Backend Models & Database
 
-- [ ] T162 [US4] Create Transaction model in backend/app/Models/Transaction.php
-- [ ] T163 [P] [US4] Create TransactionFactory in backend/database/factories/TransactionFactory.php
+- [x] T162 [US4] Create Transaction model in backend/app/Models/Transaction.php
+- [x] T163 [P] [US4] Create TransactionFactory in backend/database/factories/TransactionFactory.php
 
 ### Backend Business Logic
 
-- [ ] T164 [US4] Install Laravel Cashier for Stripe integration in backend/
-- [ ] T165 [US4] Create PaymentService with createCheckout, processPayment, refund methods in backend/app/Services/PaymentService.php
-- [ ] T166 [US4] Create ProcessPaymentAction for transaction processing in backend/app/Actions/ProcessPaymentAction.php
-- [ ] T167 [P] [US4] Create CheckoutRequest form validation in backend/app/Http/Requests/CheckoutRequest.php
-- [ ] T168 [P] [US4] Configure Stripe keys in backend/config/services.php
+- [x] T164 [US4] Install Stripe PHP SDK for Stripe integration in backend/ (using stripe/stripe-php instead of Cashier)
+- [x] T165 [US4] Create PaymentService with createCheckout, processPayment, refund methods in backend/app/Services/PaymentService.php
+- [x] T166 [US4] Create ProcessPaymentAction for transaction processing in backend/app/Actions/ProcessPaymentAction.php
+- [x] T167 [P] [US4] Create CheckoutRequest form validation in backend/app/Http/Requests/CheckoutRequest.php
+- [x] T168 [P] [US4] Configure Stripe keys in backend/config/services.php
 
 ### Backend API Controllers & Routes
 
-- [ ] T169 [US4] Create CheckoutController in backend/app/Http/Controllers/Api/V1/Payment/CheckoutController.php
-- [ ] T170 [US4] Create WebhookController for Stripe events in backend/app/Http/Controllers/Api/V1/Payment/WebhookController.php
-- [ ] T171 [US4] Create RefundController in backend/app/Http/Controllers/Api/V1/Payment/RefundController.php
-- [ ] T172 [P] [US4] Create TransactionResource in backend/app/Http/Resources/TransactionResource.php
-- [ ] T173 [US4] Add payment routes to backend/routes/api.php under /api/v1/student/checkout
+- [x] T169 [US4] Create CheckoutController in backend/app/Http/Controllers/Api/V1/Payment/CheckoutController.php
+- [x] T170 [US4] Create WebhookController for Stripe events in backend/app/Http/Controllers/Api/V1/Payment/WebhookController.php
+- [x] T171 [US4] Create RefundController in backend/app/Http/Controllers/Api/V1/Payment/RefundController.php
+- [x] T172 [P] [US4] Create TransactionResource in backend/app/Http/Resources/TransactionResource.php
+- [x] T173 [US4] Add payment routes to backend/routes/api.php under /api/v1/payment
 
 ### Backend Events & Jobs
 
-- [ ] T174 [P] [US4] Create PaymentProcessed event in backend/app/Events/PaymentProcessed.php
-- [ ] T175 [P] [US4] Create UpdateInstructorRevenue listener in backend/app/Listeners/UpdateInstructorRevenue.php
-- [ ] T176 [P] [US4] Create SendTransactionReceipt job in backend/app/Jobs/SendTransactionReceipt.php
+- [x] T174 [P] [US4] Create PaymentProcessed event in backend/app/Events/PaymentProcessed.php
+- [x] T175 [P] [US4] Create UpdateInstructorRevenue listener in backend/app/Listeners/UpdateInstructorRevenue.php
+- [x] T176 [P] [US4] Create SendTransactionReceipt job in backend/app/Jobs/SendTransactionReceipt.php
 
 ### Refund Policy Automation
 
-- [ ] T177 [US4] Implement refund eligibility check (30 days, <30% watched) in PaymentService
-- [ ] T178 [US4] Create auto-approve/deny refund logic in RefundController
-- [ ] T179 [US4] Implement Stripe refund API integration in PaymentService
+- [x] T177 [US4] Implement refund eligibility check (30 days, <30% watched) in PaymentService
+- [x] T178 [US4] Create auto-approve/deny refund logic in RefundController
+- [x] T179 [US4] Implement Stripe refund API integration in PaymentService
 
 ### Frontend State Management
 
-- [ ] T180 [US4] Create cart store (optional for multi-course cart) in frontend/src/stores/cart.ts
-- [ ] T181 [P] [US4] Create usePayment composable in frontend/src/composables/usePayment.ts
-- [ ] T182 [P] [US4] Create paymentService API client in frontend/src/services/paymentService.ts
-- [ ] T183 [P] [US4] Create Transaction TypeScript interface in frontend/src/types/Transaction.ts
+- [x] T180 [US4] Create cart store (optional for multi-course cart) in frontend/src/stores/cart.ts
+- [x] T181 [P] [US4] Create usePayment composable in frontend/src/composables/usePayment.ts
+- [x] T182 [P] [US4] Create paymentService API client in frontend/src/services/paymentService.ts
+- [x] T183 [P] [US4] Create Transaction TypeScript interface in frontend/src/types/Transaction.ts
 
 ### Frontend UI Components & Pages
 
-- [ ] T184 [US4] Create Checkout.vue page in frontend/src/views/Payment/Checkout.vue
-- [ ] T185 [US4] Create Success.vue confirmation page in frontend/src/views/Payment/Success.vue
-- [ ] T186 [US4] Add payment routes to frontend/src/router/index.ts
-- [ ] T187 [US4] Update EnrollmentButton to handle paid courses (redirect to checkout)
+- [x] T184 [US4] Create Checkout.vue page in frontend/src/views/Payment/Checkout.vue
+- [x] T185 [US4] Create Success.vue confirmation page in frontend/src/views/Payment/Success.vue
+- [x] T186 [US4] Add payment routes to frontend/src/router/index.ts
+- [x] T187 [US4] Update EnrollmentButton to handle paid courses (redirect to checkout)
 
 ### Stripe Integration
 
-- [ ] T188 [US4] Integrate Stripe Checkout hosted page (redirect flow)
-- [ ] T189 [US4] Implement webhook signature verification for security
-- [ ] T190 [US4] Test with Stripe test cards (4242 4242 4242 4242)
-- [ ] T191 [US4] Handle payment success, failure, and pending states
+- [x] T188 [US4] Integrate Stripe Checkout hosted page (redirect flow)
+- [x] T189 [US4] Implement webhook signature verification for security
+- [ ] T190 [US4] Test with Stripe test cards (4242 4242 4242 4242) - TODO: Manual testing required
+- [x] T191 [US4] Handle payment success, failure, and pending states
+
+**Phase 6 Status**: 29/30 tasks completed (96.7%)
+- ✅ Completed: T162-T189, T191
+- 📋 TODO: T190 (Manual testing with Stripe test cards)
 
 **Checkpoint**: Payment & Transactions complete - platform can now monetize courses
 

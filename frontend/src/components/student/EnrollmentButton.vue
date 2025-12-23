@@ -34,6 +34,16 @@ const formattedPrice = computed(() => {
 const handleEnroll = async () => {
   enrollmentError.value = null
 
+  // If course is paid, redirect to checkout
+  if (props.price > 0) {
+    router.push({ 
+      name: 'checkout', 
+      query: { course_id: props.courseId } 
+    })
+    return
+  }
+
+  // For free courses, enroll directly
   try {
     const enrollment = await enroll(props.courseId)
     emit('enrolled', enrollment)
@@ -62,7 +72,7 @@ const handleContinue = () => {
       @click="handleEnroll"
       class="enroll-btn"
     >
-      {{ price === 0 ? 'Enroll for Free' : `Enroll Now - ${formattedPrice}` }}
+      {{ price === 0 ? 'Enroll for Free' : `Buy Now - ${formattedPrice}` }}
     </Button>
     <Button
       v-else
