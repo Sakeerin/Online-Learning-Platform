@@ -13,8 +13,10 @@ use App\Listeners\UpdateCourseProgress;
 use App\Listeners\UpdateInstructorRevenue;
 use App\Models\Course;
 use App\Models\Enrollment;
+use App\Models\Review;
 use App\Policies\CoursePolicy;
 use App\Policies\EnrollmentPolicy;
+use App\Policies\ReviewPolicy;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\Event;
 
@@ -28,6 +30,7 @@ class AppServiceProvider extends ServiceProvider
     protected $policies = [
         Course::class => CoursePolicy::class,
         Enrollment::class => EnrollmentPolicy::class,
+        Review::class => ReviewPolicy::class,
     ];
 
     /**

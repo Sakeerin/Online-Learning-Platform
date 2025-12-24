@@ -5,13 +5,16 @@ import { useCourseDiscovery } from '@/composables/useCourseDiscovery'
 import { useEnrollment } from '@/composables/useEnrollment'
 import CourseCurriculum from '@/components/course/CourseCurriculum.vue'
 import EnrollmentButton from '@/components/student/EnrollmentButton.vue'
+import ReviewList from '@/components/student/ReviewList.vue'
 import Card from '@/components/common/Card.vue'
+import { useAuthStore } from '@/stores/auth'
 
 const route = useRoute()
 const courseId = route.params.id as string
 
 const { currentCourse, fetchCourse, isLoading, error } = useCourseDiscovery()
 const { enrollments, fetchEnrollments } = useEnrollment()
+const authStore = useAuthStore()
 const isEnrolled = ref(false)
 
 onMounted(async () => {
@@ -107,6 +110,13 @@ const ratingDisplay = computed(() => {
           </Card>
 
           <CourseCurriculum :sections="currentCourse.sections" />
+
+          <ReviewList
+            :course-id="courseId"
+            :is-enrolled="isEnrolled"
+            :is-instructor="authStore.user?.role === 'instructor' && currentCourse.instructor_id === authStore.user?.id"
+            :instructor-id="currentCourse.instructor_id"
+          />
         </main>
 
         <aside class="sidebar">

@@ -99,4 +99,12 @@ class User extends Authenticatable
     {
         return $this->hasMany(\App\Models\Transaction::class, 'user_id');
     }
+
+    /**
+     * Get the reviews written by the user.
+     */
+    public function reviews(): HasMany
+    {
+        return $this->hasMany(\App\Models\Review::class, 'user_id');
+    }
 }

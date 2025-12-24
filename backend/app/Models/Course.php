@@ -85,6 +85,14 @@ class Course extends Model
     }
 
     /**
+     * Get the reviews for the course.
+     */
+    public function reviews(): HasMany
+    {
+        return $this->hasMany(Review::class);
+    }
+
+    /**
      * Check if course is published.
      */
     public function isPublished(): bool

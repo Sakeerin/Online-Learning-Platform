@@ -10,6 +10,7 @@ use App\Http\Controllers\Api\V1\Payment\CheckoutController;
 use App\Http\Controllers\Api\V1\Payment\RefundController;
 use App\Http\Controllers\Api\V1\Payment\WebhookController;
 use App\Http\Controllers\Api\V1\Student\CourseDiscoveryController;
+use App\Http\Controllers\Api\V1\Student\ReviewController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -49,6 +50,10 @@ Route::prefix('v1')->group(function () {
         Route::get('/featured', [CourseDiscoveryController::class, 'featured']);
         Route::get('/search', [CourseDiscoveryController::class, 'search']);
         Route::get('/{id}', [CourseDiscoveryController::class, 'show']);
+        
+        // Public review routes (anyone can view reviews)
+        Route::get('/{id}/reviews', [ReviewController::class, 'index']);
+        Route::get('/{id}/reviews/{review}', [ReviewController::class, 'show']);
     });
 
     // Certificate verification (public)
@@ -87,6 +92,9 @@ Route::middleware(['auth:sanctum'])->prefix('v1')->group(function () {
         Route::delete('courses/{course}/sections/{section}/lessons/{lesson}', [LessonController::class, 'destroy']);
         Route::post('courses/{course}/sections/{section}/lessons/{lesson}/upload-video', [LessonController::class, 'uploadVideo']);
         Route::post('courses/{course}/sections/{section}/lessons/reorder', [LessonController::class, 'reorder']);
+
+        // Review response routes (instructor can respond to reviews)
+        Route::post('courses/{course}/reviews/{review}/respond', [ReviewController::class, 'respond']);
     });
     
     // Student routes  
@@ -105,6 +113,13 @@ Route::middleware(['auth:sanctum'])->prefix('v1')->group(function () {
         Route::get('enrollments/{enrollment}/lessons/{lesson}/progress', [\App\Http\Controllers\Api\V1\Student\ProgressController::class, 'show']);
         Route::put('enrollments/{enrollment}/lessons/{lesson}/progress/position', [\App\Http\Controllers\Api\V1\Student\ProgressController::class, 'updatePosition']);
         Route::post('enrollments/{enrollment}/lessons/{lesson}/progress/complete', [\App\Http\Controllers\Api\V1\Student\ProgressController::class, 'markComplete']);
+
+        // Review routes
+        Route::get('courses/{course}/reviews/my', [ReviewController::class, 'myReview']);
+        Route::post('courses/{course}/reviews', [ReviewController::class, 'store']);
+        Route::put('courses/{course}/reviews/{review}', [ReviewController::class, 'update']);
+        Route::delete('courses/{course}/reviews/{review}', [ReviewController::class, 'destroy']);
+        Route::post('courses/{course}/reviews/{review}/flag', [ReviewController::class, 'flag']);
     });
     
     // Payment routes
