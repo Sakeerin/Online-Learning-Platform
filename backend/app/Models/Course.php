@@ -93,6 +93,14 @@ class Course extends Model
     }
 
     /**
+     * Get the certificates issued for this course.
+     */
+    public function certificates(): HasMany
+    {
+        return $this->hasMany(Certificate::class);
+    }
+
+    /**
      * Check if course is published.
      */
     public function isPublished(): bool

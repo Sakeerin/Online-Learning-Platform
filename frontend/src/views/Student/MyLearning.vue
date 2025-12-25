@@ -56,7 +56,13 @@ onMounted(async () => {
               <h3>{{ enrollment.course.title }}</h3>
               <p v-if="enrollment.course.subtitle">{{ enrollment.course.subtitle }}</p>
             </div>
-            <ProgressBar :progress="enrollment.progress_percentage" />
+            <div class="progress-section">
+              <div class="progress-header">
+                <span class="progress-label">Progress</span>
+                <span class="progress-percentage">{{ Math.round(enrollment.progress_percentage) }}%</span>
+              </div>
+              <ProgressBar :progress="enrollment.progress_percentage" />
+            </div>
             <div class="enrollment-actions">
               <Button
                 @click="$router.push({ name: 'course-player', params: { courseId: enrollment.course_id } })"
@@ -152,6 +158,29 @@ onMounted(async () => {
   margin: 0;
   color: #6b7280;
   font-size: 0.875rem;
+}
+
+.progress-section {
+  margin: 1rem 0;
+}
+
+.progress-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.progress-label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #6b7280;
+}
+
+.progress-percentage {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--primary-color);
 }
 
 .enrollment-actions {

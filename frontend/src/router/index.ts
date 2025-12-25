@@ -59,6 +59,11 @@ const routes: Array<RouteRecordRaw> = [
         path: 'courses/:courseId/learn',
         name: 'course-player',
         component: () => import('../views/Student/CoursePlayer.vue')
+      },
+      {
+        path: 'certificates',
+        name: 'certificates',
+        component: () => import('../views/Student/Certificates.vue')
       }
     ]
   },
@@ -81,6 +86,11 @@ const routes: Array<RouteRecordRaw> = [
         component: () => import('../views/Courses/Detail.vue')
       }
     ]
+  },
+  {
+    path: '/certificates/verify',
+    name: 'certificate-verification',
+    component: () => import('../views/CertificateVerification.vue')
   },
   {
     path: '/payment',

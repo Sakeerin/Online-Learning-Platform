@@ -9,6 +9,8 @@ use App\Http\Controllers\Api\V1\Instructor\SectionController;
 use App\Http\Controllers\Api\V1\Payment\CheckoutController;
 use App\Http\Controllers\Api\V1\Payment\RefundController;
 use App\Http\Controllers\Api\V1\Payment\WebhookController;
+use App\Http\Controllers\Api\V1\CertificateVerificationController;
+use App\Http\Controllers\Api\V1\Student\CertificateController;
 use App\Http\Controllers\Api\V1\Student\CourseDiscoveryController;
 use App\Http\Controllers\Api\V1\Student\ReviewController;
 use Illuminate\Support\Facades\Route;
@@ -57,10 +59,7 @@ Route::prefix('v1')->group(function () {
     });
 
     // Certificate verification (public)
-    Route::get('certificates/verify/{code}', function () {
-        // Will be implemented in User Story 6: Certificates
-        return response()->json(['message' => 'Certificate verification endpoint']);
-    });
+    Route::get('certificates/verify/{code}', [CertificateVerificationController::class, 'verify']);
 });
 
 // Protected routes (require authentication)
@@ -120,6 +119,11 @@ Route::middleware(['auth:sanctum'])->prefix('v1')->group(function () {
         Route::put('courses/{course}/reviews/{review}', [ReviewController::class, 'update']);
         Route::delete('courses/{course}/reviews/{review}', [ReviewController::class, 'destroy']);
         Route::post('courses/{course}/reviews/{review}/flag', [ReviewController::class, 'flag']);
+
+        // Certificate routes
+        Route::get('certificates', [CertificateController::class, 'index']);
+        Route::get('enrollments/{enrollment}/certificate', [CertificateController::class, 'show']);
+        Route::get('certificates/{certificate}/download', [CertificateController::class, 'download']);
     });
     
     // Payment routes

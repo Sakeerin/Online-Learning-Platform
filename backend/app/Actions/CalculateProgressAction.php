@@ -2,6 +2,7 @@
 
 namespace App\Actions;
 
+use App\Events\CourseCompleted;
 use App\Models\Enrollment;
 use Illuminate\Support\Facades\DB;
 
@@ -39,11 +40,18 @@ class CalculateProgressAction
 
             // Update enrollment
             $isCompleted = $progressPercentage >= 100.00;
+            $wasCompleted = $enrollment->is_completed;
+            
             $enrollment->update([
                 'progress_percentage' => round($progressPercentage, 2),
                 'is_completed' => $isCompleted,
                 'completed_at' => $isCompleted && !$enrollment->completed_at ? now() : $enrollment->completed_at,
             ]);
+
+            // Dispatch CourseCompleted event if course just reached 100%
+            if ($isCompleted && !$wasCompleted) {
+                event(new CourseCompleted($enrollment->fresh()));
+            }
 
             return $enrollment->fresh();
         });

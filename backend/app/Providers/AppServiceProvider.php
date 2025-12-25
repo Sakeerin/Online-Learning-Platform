@@ -2,11 +2,13 @@
 
 namespace App\Providers;
 
+use App\Events\CourseCompleted;
 use App\Events\CoursePublished;
 use App\Events\LessonCompleted;
 use App\Events\PaymentProcessed;
 use App\Events\StudentEnrolled;
 use App\Jobs\SendTransactionReceipt;
+use App\Listeners\IssueCertificate;
 use App\Listeners\SendCoursePublishedNotification;
 use App\Listeners\SendEnrollmentConfirmation;
 use App\Listeners\UpdateCourseProgress;
@@ -74,6 +76,11 @@ class AppServiceProvider extends ServiceProvider
             function (PaymentProcessed $event) {
                 SendTransactionReceipt::dispatch($event->transaction);
             }
+        );
+
+        Event::listen(
+            CourseCompleted::class,
+            IssueCertificate::class
         );
     }
 }

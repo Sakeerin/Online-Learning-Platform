@@ -107,4 +107,12 @@ class User extends Authenticatable
     {
         return $this->hasMany(\App\Models\Review::class, 'user_id');
     }
+
+    /**
+     * Get the certificates earned by the user.
+     */
+    public function certificates(): HasMany
+    {
+        return $this->hasMany(\App\Models\Certificate::class, 'user_id');
+    }
 }
