@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\V1\Auth\PasswordResetController;
 use App\Http\Controllers\Api\V1\Auth\RegisterController;
 use App\Http\Controllers\Api\V1\Instructor\CourseController;
 use App\Http\Controllers\Api\V1\Instructor\LessonController;
+use App\Http\Controllers\Api\V1\Instructor\QuizController as InstructorQuizController;
 use App\Http\Controllers\Api\V1\Instructor\SectionController;
 use App\Http\Controllers\Api\V1\Payment\CheckoutController;
 use App\Http\Controllers\Api\V1\Payment\RefundController;
@@ -12,6 +13,7 @@ use App\Http\Controllers\Api\V1\Payment\WebhookController;
 use App\Http\Controllers\Api\V1\CertificateVerificationController;
 use App\Http\Controllers\Api\V1\Student\CertificateController;
 use App\Http\Controllers\Api\V1\Student\CourseDiscoveryController;
+use App\Http\Controllers\Api\V1\Student\QuizController as StudentQuizController;
 use App\Http\Controllers\Api\V1\Student\ReviewController;
 use Illuminate\Support\Facades\Route;
 
@@ -92,6 +94,12 @@ Route::middleware(['auth:sanctum'])->prefix('v1')->group(function () {
         Route::post('courses/{course}/sections/{section}/lessons/{lesson}/upload-video', [LessonController::class, 'uploadVideo']);
         Route::post('courses/{course}/sections/{section}/lessons/reorder', [LessonController::class, 'reorder']);
 
+        // Quiz routes (nested under courses and lessons)
+        Route::post('courses/{course}/lessons/{lesson}/quizzes', [InstructorQuizController::class, 'store']);
+        Route::get('courses/{course}/lessons/{lesson}/quizzes/{quiz}', [InstructorQuizController::class, 'show']);
+        Route::put('courses/{course}/lessons/{lesson}/quizzes/{quiz}', [InstructorQuizController::class, 'update']);
+        Route::delete('courses/{course}/lessons/{lesson}/quizzes/{quiz}', [InstructorQuizController::class, 'destroy']);
+
         // Review response routes (instructor can respond to reviews)
         Route::post('courses/{course}/reviews/{review}/respond', [ReviewController::class, 'respond']);
     });
@@ -106,6 +114,13 @@ Route::middleware(['auth:sanctum'])->prefix('v1')->group(function () {
         // Learning routes
         Route::get('courses/{course}/learning', [\App\Http\Controllers\Api\V1\Student\LearningController::class, 'getCourseLearning']);
         Route::get('courses/{course}/lessons/{lesson}/video-url', [\App\Http\Controllers\Api\V1\Student\LearningController::class, 'getVideoUrl']);
+
+        // Quiz routes (for students)
+        Route::get('courses/{course}/lessons/{lesson}/quiz', [StudentQuizController::class, 'show']);
+        Route::post('courses/{course}/lessons/{lesson}/quiz/submit', [StudentQuizController::class, 'submit']);
+        Route::get('courses/{course}/lessons/{lesson}/quiz/attempts', [StudentQuizController::class, 'attempts']);
+        Route::get('courses/{course}/lessons/{lesson}/quiz/attempts/{attempt}', [StudentQuizController::class, 'results']);
+        Route::get('courses/{course}/lessons/{lesson}/quiz/can-retake', [StudentQuizController::class, 'canRetake']);
 
         // Progress routes
         Route::get('enrollments/{enrollment}/progress', [\App\Http\Controllers\Api\V1\Student\ProgressController::class, 'index']);

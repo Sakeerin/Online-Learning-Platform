@@ -495,29 +495,32 @@
 
 ### Backend Models & Database
 
-- [ ] T228 [P] [US7] Create Quiz model in backend/app/Models/Quiz.php
-- [ ] T229 [P] [US7] Create Question model in backend/app/Models/Question.php
-- [ ] T230 [P] [US7] Create QuizAttempt model in backend/app/Models/QuizAttempt.php
-- [ ] T231 [P] [US7] Create QuizFactory in backend/database/factories/QuizFactory.php
+- [x] T228 [P] [US7] Create Quiz model in backend/app/Models/Quiz.php
+- [x] T229 [P] [US7] Create Question model in backend/app/Models/Question.php
+- [x] T230 [P] [US7] Create QuizAttempt model in backend/app/Models/QuizAttempt.php
+- [x] T231 [P] [US7] Create QuizFactory in backend/database/factories/QuizFactory.php
 
 ### Backend Business Logic
 
-- [ ] T232 [US7] Create QuizService with create, evaluate, record methods in backend/app/Services/QuizService.php
-- [ ] T233 [US7] Implement quiz scoring logic (correct answers / total * 100)
-- [ ] T234 [US7] Implement pass/fail logic based on passing score threshold
+- [x] T232 [US7] Create QuizService with create, evaluate, record methods in backend/app/Services/QuizService.php
+- [x] T233 [US7] Implement quiz scoring logic (correct answers / total * 100)
+- [x] T234 [US7] Implement pass/fail logic based on passing score threshold
 
 ### Backend API Controllers & Routes
 
-- [ ] T235 [US7] Create QuizController in backend/app/Http/Controllers/Api/V1/Instructor/QuizController.php
-- [ ] T236 [US7] Create student quiz endpoint for taking quizzes
-- [ ] T237 [US7] Add quiz routes to backend/routes/api.php
+- [x] T235 [US7] Create QuizController in backend/app/Http/Controllers/Api/V1/Instructor/QuizController.php
+- [x] T236 [US7] Create student quiz endpoint for taking quizzes
+- [x] T237 [US7] Add quiz routes to backend/routes/api.php
 
 ### Frontend UI Components
 
-- [ ] T238 [P] [US7] Create QuizBuilder.vue for instructors in frontend/src/components/instructor/QuizBuilder.vue
-- [ ] T239 [P] [US7] Create QuizPlayer.vue for students
-- [ ] T240 [US7] Display quiz results with correct/incorrect answers highlighted
-- [ ] T241 [US7] Allow quiz retakes if enabled
+- [x] T238 [P] [US7] Create QuizBuilder.vue for instructors in frontend/src/components/instructor/QuizBuilder.vue
+- [x] T239 [P] [US7] Create QuizPlayer.vue for students
+- [x] T240 [US7] Display quiz results with correct/incorrect answers highlighted
+- [x] T241 [US7] Allow quiz retakes if enabled
+
+**Phase 9 Status**: 14/14 tasks completed (100%)
+- ✅ Completed: T228-T241
 
 **Checkpoint**: Interactive Quizzes complete - courses now have knowledge assessments
 

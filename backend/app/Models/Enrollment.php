@@ -77,6 +77,14 @@ class Enrollment extends Model
     }
 
     /**
+     * Get the quiz attempts for this enrollment.
+     */
+    public function quizAttempts(): HasMany
+    {
+        return $this->hasMany(QuizAttempt::class);
+    }
+
+    /**
      * Check if enrollment is completed.
      */
     public function isCompleted(): bool

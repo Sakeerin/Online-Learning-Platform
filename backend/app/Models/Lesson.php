@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Lesson extends Model
 {
@@ -77,6 +78,14 @@ class Lesson extends Model
     public function isArticle(): bool
     {
         return $this->type === 'article';
+    }
+
+    /**
+     * Get the quiz for this lesson (if type is quiz).
+     */
+    public function quiz(): HasOne
+    {
+        return $this->hasOne(Quiz::class);
     }
 }
 
