@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Lesson extends Model
@@ -86,6 +87,14 @@ class Lesson extends Model
     public function quiz(): HasOne
     {
         return $this->hasOne(Quiz::class);
+    }
+
+    /**
+     * Get the discussions for this lesson.
+     */
+    public function discussions(): HasMany
+    {
+        return $this->hasMany(Discussion::class);
     }
 }
 

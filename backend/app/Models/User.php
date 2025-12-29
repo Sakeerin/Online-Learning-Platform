@@ -109,6 +109,22 @@ class User extends Authenticatable
     }
 
     /**
+     * Get the discussions posted by the user.
+     */
+    public function discussions(): HasMany
+    {
+        return $this->hasMany(\App\Models\Discussion::class, 'user_id');
+    }
+
+    /**
+     * Get the replies posted by the user.
+     */
+    public function replies(): HasMany
+    {
+        return $this->hasMany(\App\Models\Reply::class, 'user_id');
+    }
+
+    /**
      * Get the certificates earned by the user.
      */
     public function certificates(): HasMany

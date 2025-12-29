@@ -135,6 +135,15 @@ Route::middleware(['auth:sanctum'])->prefix('v1')->group(function () {
         Route::delete('courses/{course}/reviews/{review}', [ReviewController::class, 'destroy']);
         Route::post('courses/{course}/reviews/{review}/flag', [ReviewController::class, 'flag']);
 
+        // Discussion/Q&A routes
+        Route::get('courses/{course}/discussions', [\App\Http\Controllers\Api\V1\Student\DiscussionController::class, 'index']);
+        Route::get('courses/{course}/discussions/{discussion}', [\App\Http\Controllers\Api\V1\Student\DiscussionController::class, 'show']);
+        Route::post('courses/{course}/discussions', [\App\Http\Controllers\Api\V1\Student\DiscussionController::class, 'store']);
+        Route::post('courses/{course}/discussions/{discussion}/upvote', [\App\Http\Controllers\Api\V1\Student\DiscussionController::class, 'upvote']);
+        Route::get('courses/{course}/discussions/{discussion}/replies', [\App\Http\Controllers\Api\V1\Student\DiscussionController::class, 'replies']);
+        Route::post('courses/{course}/discussions/{discussion}/replies', [\App\Http\Controllers\Api\V1\Student\DiscussionController::class, 'reply']);
+        Route::post('courses/{course}/discussions/{discussion}/replies/{reply}/upvote', [\App\Http\Controllers\Api\V1\Student\DiscussionController::class, 'upvoteReply']);
+
         // Certificate routes
         Route::get('certificates', [CertificateController::class, 'index']);
         Route::get('enrollments/{enrollment}/certificate', [CertificateController::class, 'show']);

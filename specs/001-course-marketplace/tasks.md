@@ -534,27 +534,27 @@
 
 ### Backend Models & Database
 
-- [ ] T242 [P] [US8] Create Discussion model in backend/app/Models/Discussion.php
-- [ ] T243 [P] [US8] Create Reply model in backend/app/Models/Reply.php
-- [ ] T244 [P] [US8] Create DiscussionFactory in backend/database/factories/DiscussionFactory.php
+- [x] T242 [P] [US8] Create Discussion model in backend/app/Models/Discussion.php
+- [x] T243 [P] [US8] Create Reply model in backend/app/Models/Reply.php
+- [x] T244 [P] [US8] Create DiscussionFactory in backend/database/factories/DiscussionFactory.php
 
 ### Backend Business Logic
 
-- [ ] T245 [US8] Create discussion posting and reply logic
-- [ ] T246 [US8] Implement upvoting system for replies
-- [ ] T247 [US8] Mark instructor replies with badge
+- [x] T245 [US8] Create discussion posting and reply logic
+- [x] T246 [US8] Implement upvoting system for replies
+- [x] T247 [US8] Mark instructor replies with badge
 
 ### Backend API Controllers & Routes
 
-- [ ] T248 [US8] Create discussion endpoints for post, reply, search
-- [ ] T249 [US8] Add discussion routes to backend/routes/api.php
+- [x] T248 [US8] Create discussion endpoints for post, reply, search
+- [x] T249 [US8] Add discussion routes to backend/routes/api.php
 
 ### Frontend UI Components
 
-- [ ] T250 [P] [US8] Create DiscussionForum.vue component
-- [ ] T251 [P] [US8] Create QuestionPost.vue component
-- [ ] T252 [US8] Add Q&A section to CoursePlayer
-- [ ] T253 [US8] Implement search and filter for discussions
+- [x] T250 [P] [US8] Create DiscussionForum.vue component
+- [x] T251 [P] [US8] Create QuestionPost.vue component
+- [x] T252 [US8] Add Q&A section to CoursePlayer
+- [x] T253 [US8] Implement search and filter for discussions
 
 **Checkpoint**: Course Discussions complete - courses now have community support
 

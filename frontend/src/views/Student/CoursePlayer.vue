@@ -6,6 +6,7 @@ import enrollmentService from '@/services/enrollmentService'
 import certificateService from '@/services/certificateService'
 import LessonPlayer from '@/components/student/LessonPlayer.vue'
 import CourseProgress from '@/components/course/CourseProgress.vue'
+import DiscussionForum from '@/components/student/DiscussionForum.vue'
 import Card from '@/components/common/Card.vue'
 import Button from '@/components/common/Button.vue'
 import type { Section, Lesson } from '@/types/Course'
@@ -169,6 +170,11 @@ const handleDownloadCertificate = async () => {
           @lesson-complete="handleLessonComplete"
           @next-lesson="handleNextLesson"
         />
+
+        <!-- Q&A Section -->
+        <Card class="qa-section">
+          <DiscussionForum :course-id="courseId" :lesson-id="currentLesson?.id" />
+        </Card>
       </div>
 
       <div class="player-sidebar">

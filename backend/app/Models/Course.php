@@ -93,6 +93,14 @@ class Course extends Model
     }
 
     /**
+     * Get the discussions for the course.
+     */
+    public function discussions(): HasMany
+    {
+        return $this->hasMany(Discussion::class);
+    }
+
+    /**
      * Get the certificates issued for this course.
      */
     public function certificates(): HasMany
