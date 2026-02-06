@@ -1,0 +1,72 @@
+# Stage 1: Install Composer dependencies
+FROM composer:2 AS vendor
+
+WORKDIR /app
+
+COPY backend/composer.json backend/composer.lock ./
+
+RUN composer install \
+    --no-dev \
+    --no-interaction \
+    --prefer-dist \
+    --optimize-autoloader \
+    --no-scripts
+
+# Stage 2: Production PHP-FPM image
+FROM php:8.2-fpm-alpine
+
+WORKDIR /var/www/html
+
+# Install system dependencies
+RUN apk add --no-cache \
+    libpng-dev \
+    oniguruma-dev \
+    libxml2-dev \
+    postgresql-dev \
+    linux-headers \
+    freetype-dev \
+    libjpeg-turbo-dev \
+    $PHPIZE_DEPS
+
+# Install PHP extensions
+RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
+    && docker-php-ext-install \
+        pdo \
+        pdo_pgsql \
+        mbstring \
+        bcmath \
+        gd \
+        opcache \
+        pcntl
+
+# Install Redis extension
+RUN pecl install redis \
+    && docker-php-ext-enable redis
+
+# Remove build dependencies to reduce image size
+RUN apk del $PHPIZE_DEPS linux-headers
+
+# Copy OPcache configuration
+COPY docker/php/opcache.ini /usr/local/etc/php/conf.d/opcache.ini
+
+# Copy vendor from composer stage
+COPY --from=vendor /app/vendor ./vendor
+
+# Copy application code
+COPY backend/ .
+
+# Cache configuration, routes, and views
+RUN php artisan config:cache \
+    && php artisan route:cache \
+    && php artisan view:cache
+
+# Set permissions
+RUN chown -R www-data:www-data /var/www/html \
+    && chmod -R 755 /var/www/html/storage \
+    && chmod -R 755 /var/www/html/bootstrap/cache
+
+EXPOSE 9000
+
+USER www-data
+
+CMD ["php-fpm"]

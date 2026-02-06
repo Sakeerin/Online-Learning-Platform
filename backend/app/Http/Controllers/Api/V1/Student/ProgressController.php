@@ -10,6 +10,12 @@ use App\Services\ProgressService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
+/**
+ * @group Student - Progress
+ * @authenticated
+ *
+ * Endpoints for tracking lesson progress, video positions, and completion status.
+ */
 class ProgressController extends Controller
 {
     public function __construct(

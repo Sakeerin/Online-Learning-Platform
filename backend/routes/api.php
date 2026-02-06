@@ -38,7 +38,7 @@ Route::get('/health', function () {
 });
 
 // Public routes (no authentication required)
-Route::prefix('v1')->group(function () {
+Route::prefix('v1')->middleware(['throttle:public'])->group(function () {
     
     // Authentication routes
     Route::prefix('auth')->group(function () {
@@ -65,7 +65,7 @@ Route::prefix('v1')->group(function () {
 });
 
 // Protected routes (require authentication)
-Route::middleware(['auth:sanctum'])->prefix('v1')->group(function () {
+Route::middleware(['auth:sanctum', 'throttle:api'])->prefix('v1')->group(function () {
     
     // Authenticated user routes
     Route::post('auth/logout', [LoginController::class, 'logout']);
@@ -168,5 +168,5 @@ Route::middleware(['auth:sanctum'])->prefix('v1')->group(function () {
 // Webhook routes (for external services like Stripe)
 // Note: Webhooks should not use CSRF protection
 Route::post('webhooks/stripe', [WebhookController::class, 'handle'])
-    ->middleware(\Illuminate\Http\Middleware\ValidatePostSize::class);
+    ->middleware([\Illuminate\Http\Middleware\ValidatePostSize::class, 'throttle:webhooks']);
 

@@ -1,8 +1,8 @@
 # Quickstart Guide: Course Marketplace Platform
 
-**Goal**: Get the platform running locally in under 10 minutes  
-**Target**: Developers setting up for first time  
-**Prerequisites**: Docker Desktop installed and running
+**Goal**: Get the platform running locally in under 10 minutes
+**Target**: Developers setting up for first time
+**Prerequisites**: Docker Desktop installed and running, Node.js 20+
 
 ---
 
@@ -12,23 +12,20 @@
 
 ```bash
 # Clone repository
-git clone https://github.com/your-org/online-learning-platform.git
-cd online-learning-platform
+git clone https://github.com/Sakeerin/Online-Learning-Platform.git
+cd Online-Learning-Platform
 
 # Copy environment file
-cp .env.example .env
-
-# Generate application key
-./vendor/bin/sail artisan key:generate
+cp backend/.env.example backend/.env
 ```
 
 ### Step 2: Configure Environment (1 min)
 
-Edit `.env` file with these essential values:
+Edit `backend/.env` file with these essential values:
 
 ```env
 APP_NAME="Course Marketplace"
-APP_URL=http://localhost
+APP_URL=http://localhost:8000
 
 # Database (PostgreSQL via Docker)
 DB_CONNECTION=pgsql
@@ -67,27 +64,35 @@ SANCTUM_STATEFUL_DOMAINS=localhost:5173
 ### Step 3: Start Docker Services (3 min)
 
 ```bash
-# Start all services (Laravel, PostgreSQL, Redis, Mailpit)
-./vendor/bin/sail up -d
+# Start all services (Laravel, PostgreSQL, Redis, Mailpit, Nginx)
+docker compose up -d
 
 # Wait for services to be healthy (~30 seconds)
-# Check status: ./vendor/bin/sail ps
+# Check status: docker compose ps
+
+# Install Composer dependencies
+docker compose exec app composer install
+
+# Generate application key
+docker compose exec app php artisan key:generate
 ```
 
 ### Step 4: Database Setup (2 min)
 
 ```bash
 # Run migrations
-./vendor/bin/sail artisan migrate
+docker compose exec app php artisan migrate
 
-# Seed database with sample data (optional)
-./vendor/bin/sail artisan db:seed
+# Seed database with demo data
+docker compose exec app php artisan db:seed
 
 # This creates:
-# - 2 instructor accounts
-# - 5 student accounts
-# - 10 sample courses with sections and video lessons
-# - Sample enrollments and reviews
+# - 2 instructor accounts (instructor@example.com, instructor2@example.com)
+# - 5 student accounts (student@example.com through student5@example.com)
+# - 1 admin account (admin@example.com)
+# - 10 sample courses with sections, lessons, and quizzes
+# - Sample enrollments, reviews, transactions, discussions, and certificates
+# - All passwords: "password"
 ```
 
 ### Step 5: Frontend Setup (2 min)
@@ -107,10 +112,10 @@ npm run dev
 
 ### Step 6: Verify Installation
 
-**Backend API**: http://localhost:8000/api/v1/health  
-**Frontend**: http://localhost:5173  
-**Mailpit** (email testing): http://localhost:8025  
-**API Documentation**: http://localhost:8000/api/documentation
+**Backend API**: http://localhost:8000/api/v1/health
+**Frontend**: http://localhost:5173
+**Mailpit** (email testing): http://localhost:8025
+**API Documentation**: http://localhost:8000/docs/index.html
 
 ### Test Accounts (from seeder)
 
@@ -122,32 +127,39 @@ npm run dev
 - Email: `student@example.com`
 - Password: `password`
 
+**Admin**:
+- Email: `admin@example.com`
+- Password: `password`
+
 ---
 
 ## Development Workflow
 
 ### Running Commands
 
-Use Laravel Sail for all backend commands:
+Use Docker Compose for all backend commands:
 
 ```bash
 # Artisan commands
-./vendor/bin/sail artisan migrate
-./vendor/bin/sail artisan tinker
+docker compose exec app php artisan migrate
+docker compose exec app php artisan tinker
 
 # Composer
-./vendor/bin/sail composer install
-./vendor/bin/sail composer require package-name
+docker compose exec app composer install
+docker compose exec app composer require package-name
 
 # Tests
-./vendor/bin/sail artisan test
-./vendor/bin/sail artisan test --filter CourseTest
+docker compose exec app php artisan test
+docker compose exec app php artisan test --filter CourseTest
 
 # Queue worker (for background jobs)
-./vendor/bin/sail artisan queue:work
+docker compose exec app php artisan queue:work
 
 # Code formatting
-./vendor/bin/sail php ./vendor/bin/pint
+docker compose exec app ./vendor/bin/pint
+
+# Generate API documentation
+docker compose exec app php artisan scribe:generate
 ```
 
 Frontend commands (from `frontend/` directory):
@@ -162,12 +174,8 @@ npm run build
 # Lint
 npm run lint
 
-# Tests
-npm run test
-npm run test:watch
-
 # Type checking
-npm run type-check
+npx vue-tsc --noEmit
 ```
 
 ---
@@ -187,30 +195,15 @@ npm run type-check
 ### Enroll in a Course (as Student)
 
 1. Login as student at http://localhost:5173/login
-2. Browse courses at http://localhost:5173/courses
+2. Browse courses at http://localhost:5173/courses/browse
 3. Click on a course to view details
 4. Click "Enroll Now" (free) or "Buy Now" (paid)
 5. For paid courses, use Stripe test card: `4242 4242 4242 4242`
 6. Access course from "My Learning"
 
-### Test Video Upload
-
-```bash
-# Create sample video lesson
-./vendor/bin/sail artisan tinker
-
-# In tinker:
-$lesson = App\Models\Lesson::factory()->create(['type' => 'video']);
-
-# Upload test video via API
-curl -X POST http://localhost:8000/api/v1/instructor/lessons/{lesson-id}/upload-video \
-  -H "Authorization: Bearer {token}" \
-  -F "video=@test-video.mp4"
-```
-
 ### Test Email Notifications
 
-1. Trigger email (e.g., register new account)
+1. Trigger email (e.g., register new account, enroll in course)
 2. Open Mailpit at http://localhost:8025
 3. View sent email in inbox
 
@@ -224,20 +217,20 @@ If port 8000, 5173, or 5432 is already in use:
 
 ```bash
 # Stop conflicting services
-./vendor/bin/sail down
+docker compose down
 
-# Change ports in docker-compose.yml
-# Edit APP_PORT, FORWARD_DB_PORT, VITE_PORT
+# Change ports in docker-compose.yml or .env
+# Edit APP_PORT, FORWARD_DB_PORT, FORWARD_REDIS_PORT
 ```
 
 ### Database Connection Failed
 
 ```bash
 # Restart PostgreSQL container
-./vendor/bin/sail restart pgsql
+docker compose restart pgsql
 
 # Check logs
-./vendor/bin/sail logs pgsql
+docker compose logs pgsql
 ```
 
 ### Frontend Not Loading
@@ -258,24 +251,21 @@ For local development without AWS S3:
 
 ```bash
 # Create symbolic link for storage
-./vendor/bin/sail artisan storage:link
+docker compose exec app php artisan storage:link
 
 # Ensure storage directory is writable
-./vendor/bin/sail chmod -R 775 storage
+docker compose exec app chmod -R 775 storage
 ```
 
 ### Tests Failing
 
 ```bash
-# Create test database
-./vendor/bin/sail artisan migrate --database=pgsql_testing
-
 # Clear cache
-./vendor/bin/sail artisan config:clear
-./vendor/bin/sail artisan cache:clear
+docker compose exec app php artisan config:clear
+docker compose exec app php artisan cache:clear
 
 # Run tests
-./vendor/bin/sail artisan test
+docker compose exec app php artisan test
 ```
 
 ---
@@ -291,12 +281,18 @@ backend/
 │   ├── Http/
 │   │   ├── Controllers/  # API controllers (versioned /api/v1/*)
 │   │   ├── Requests/     # Form validation
-│   │   └── Resources/    # API response transformers
-│   ├── Services/         # Business logic (CourseService, PaymentService)
+│   │   └── Middleware/    # Custom middleware (EnsureInstructor, EnsureStudent)
+│   ├── Services/         # Business logic (CourseService, PaymentService, CacheService)
+│   ├── Exceptions/       # Custom API exceptions
+│   ├── Mail/             # Mailable classes (email templates)
 │   ├── Policies/         # Authorization (CoursePolicy, EnrollmentPolicy)
-│   └── Jobs/             # Background tasks (ProcessVideoUpload, etc.)
-├── database/migrations/  # Database schema
-├── routes/api.php        # API routes
+│   ├── Jobs/             # Background tasks (ProcessVideoUpload, etc.)
+│   └── Events/           # Domain events (CoursePublished, StudentEnrolled)
+├── database/
+│   ├── migrations/       # Database schema (18 migrations)
+│   ├── seeders/          # Demo data seeders
+│   └── factories/        # Model factories for testing
+├── routes/api.php        # API routes (50+ endpoints)
 └── tests/                # PHPUnit tests
 ```
 
@@ -305,59 +301,53 @@ backend/
 ```
 frontend/
 ├── src/
-│   ├── components/       # Vue components
-│   ├── views/            # Page components
-│   ├── stores/           # Pinia state management
-│   ├── services/         # API clients
-│   └── router/           # Vue Router
+│   ├── components/       # Vue components (common, course, student, instructor)
+│   ├── views/            # Page components (18 views)
+│   ├── stores/           # Pinia state management (5 stores)
+│   ├── composables/      # Vue composables (7 composables)
+│   ├── services/         # API clients (axios-based)
+│   ├── types/            # TypeScript interfaces
+│   ├── plugins/          # Vue plugins (toast notifications)
+│   └── router/           # Vue Router with auth guards
 └── tests/                # Vitest tests
 ```
 
 ### Key Technologies
 
 - **Backend**: Laravel 11, PHP 8.2, PostgreSQL 14, Redis 7
-- **Frontend**: Vue.js 3, TypeScript, Vite, Pinia
+- **Frontend**: Vue.js 3, TypeScript, Vite 5, Pinia
 - **Auth**: Laravel Sanctum (API tokens)
 - **Storage**: AWS S3 (production), local storage (development)
 - **Payments**: Stripe
-- **Email**: SendGrid (production), Mailpit (development)
+- **Email**: Mailpit (development), configurable for production
+- **Cache**: Redis with targeted invalidation
+- **CI/CD**: GitHub Actions (backend tests + frontend tests)
+- **Docker**: Development and production configurations
 
 ---
 
-## Next Steps
+## Production Deployment
 
-1. **Read the Spec**: Review [spec.md](spec.md) for user stories and requirements
-2. **Review Data Model**: Check [data-model.md](data-model.md) for database schema
-3. **API Contracts**: Explore [contracts/](contracts/) for API documentation
-4. **Run Tests**: Execute test suite to ensure setup is correct
-5. **Start Developing**: Pick a user story and implement features
+For production deployment, use the production Docker configuration:
 
-### Recommended First Task
+```bash
+# Build and start production services
+docker compose -f docker-compose.prod.yml up -d --build
 
-Implement User Story 1 (Instructor Course Creation):
-1. Create course form component (frontend)
-2. Add course creation API endpoint (backend)
-3. Write tests for creation flow
-4. Test in browser
+# Run migrations
+docker compose -f docker-compose.prod.yml exec app php artisan migrate --force
+
+# Seed initial data (first deployment only)
+docker compose -f docker-compose.prod.yml exec app php artisan db:seed
+```
 
 ---
 
 ## Resources
 
-- **Constitution**: [.specify/memory/constitution.md](../../.specify/memory/constitution.md)
-- **Contributing**: [CONTRIBUTING.md](../../CONTRIBUTING.md)
-- **Research**: [research.md](research.md)
+- **Specification**: [spec.md](spec.md)
+- **Data Model**: [data-model.md](data-model.md)
+- **Task List**: [tasks.md](tasks.md)
 - **Laravel Docs**: https://laravel.com/docs/11.x
 - **Vue.js Docs**: https://vuejs.org/guide/
 - **Stripe Testing**: https://stripe.com/docs/testing
-
----
-
-## Getting Help
-
-- **Issues**: Check existing issues or create new one
-- **Discussions**: Join team discussions for questions
-- **Docs**: Review specification documents in `specs/001-course-marketplace/`
-
-**Happy coding!** 🚀
-

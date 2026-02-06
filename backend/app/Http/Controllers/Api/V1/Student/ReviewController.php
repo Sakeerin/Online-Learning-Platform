@@ -11,6 +11,11 @@ use App\Services\ReviewService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
+/**
+ * @group Student - Reviews
+ *
+ * Endpoints for viewing, creating, updating, and managing course reviews.
+ */
 class ReviewController extends Controller
 {
     public function __construct(

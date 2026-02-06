@@ -5,6 +5,7 @@ import CourseCard from '@/components/course/CourseCard.vue'
 import ProgressBar from '@/components/student/ProgressBar.vue'
 import Card from '@/components/common/Card.vue'
 import Button from '@/components/common/Button.vue'
+import SkeletonList from '@/components/common/SkeletonList.vue'
 
 const { enrollments, activeEnrollments, completedEnrollments, fetchEnrollments, isLoading } = useEnrollment()
 const activeTab = ref<'active' | 'completed'>('active')
@@ -22,14 +23,20 @@ onMounted(async () => {
         <p>Continue your learning journey</p>
       </header>
 
-      <div class="tabs">
+      <div class="tabs" role="tablist" aria-label="Course categories">
         <button
+          role="tab"
+          :aria-selected="activeTab === 'active'"
+          aria-controls="active-panel"
           :class="['tab', { active: activeTab === 'active' }]"
           @click="activeTab = 'active'"
         >
           Active Courses ({{ activeEnrollments.length }})
         </button>
         <button
+          role="tab"
+          :aria-selected="activeTab === 'completed'"
+          aria-controls="completed-panel"
           :class="['tab', { active: activeTab === 'completed' }]"
           @click="activeTab = 'completed'"
         >
@@ -37,7 +44,7 @@ onMounted(async () => {
         </button>
       </div>
 
-      <div v-if="isLoading" class="loading">Loading your courses...</div>
+      <SkeletonList v-if="isLoading" :count="6" />
       <div v-else-if="activeTab === 'active' && activeEnrollments.length === 0" class="empty-state">
         <p>You haven't enrolled in any courses yet.</p>
         <Button @click="$router.push({ name: 'browse-courses' })">Browse Courses</Button>
@@ -126,7 +133,6 @@ onMounted(async () => {
   border-bottom-color: var(--primary-color);
 }
 
-.loading,
 .empty-state {
   text-align: center;
   padding: 4rem 2rem;

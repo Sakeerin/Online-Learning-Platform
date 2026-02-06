@@ -10,6 +10,12 @@ use App\Services\EnrollmentService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
+/**
+ * @group Student - Enrollments
+ * @authenticated
+ *
+ * Endpoints for students to enroll in courses and view their enrollments.
+ */
 class EnrollmentController extends Controller
 {
     public function __construct(

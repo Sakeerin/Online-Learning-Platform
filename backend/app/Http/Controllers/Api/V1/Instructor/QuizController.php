@@ -11,6 +11,12 @@ use App\Services\QuizService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
+/**
+ * @group Instructor - Quizzes
+ * @authenticated
+ *
+ * Endpoints for instructors to create, update, and manage quizzes for lessons.
+ */
 class QuizController extends Controller
 {
     public function __construct(

@@ -117,6 +117,11 @@ const routes: Array<RouteRecordRaw> = [
         component: () => import('../views/Payment/Success.vue')
       }
     ]
+  },
+  {
+    path: '/:pathMatch(.*)*',
+    name: 'not-found',
+    component: () => import('../views/errors/NotFound.vue')
   }
 ]
 

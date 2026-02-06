@@ -14,6 +14,12 @@ use App\Services\DiscussionService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
+/**
+ * @group Student - Discussions
+ * @authenticated
+ *
+ * Endpoints for course discussions, Q&A, replies, and upvoting.
+ */
 class DiscussionController extends Controller
 {
     public function __construct(

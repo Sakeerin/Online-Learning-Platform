@@ -7,6 +7,11 @@ use App\Http\Resources\CertificateResource;
 use App\Services\CertificateService;
 use Illuminate\Http\JsonResponse;
 
+/**
+ * @group Certificate Verification
+ *
+ * Public endpoint for verifying certificate authenticity by verification code.
+ */
 class CertificateVerificationController extends Controller
 {
     public function __construct(

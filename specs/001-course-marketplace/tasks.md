@@ -598,21 +598,21 @@
 
 **Purpose**: Improvements that affect multiple user stories
 
-- [ ] T266 [P] Add comprehensive error handling and user-friendly error messages
-- [ ] T267 [P] Implement loading states and skeleton screens across all pages
-- [ ] T268 [P] Add toast notifications for success/error feedback
-- [ ] T269 [P] Optimize database queries with indexes and eager loading
-- [ ] T270 [P] Implement Redis caching for frequently accessed data
-- [ ] T271 [P] Add rate limiting to API endpoints (60 requests/minute per user)
-- [ ] T272 [P] Configure CORS for frontend domain in backend
-- [ ] T273 [P] Set up email templates with Laravel Mailables
-- [ ] T274 [P] Create database seeders for demo data in backend/database/seeders/
-- [ ] T275 [P] Write API documentation with Laravel Scribe or OpenAPI
-- [ ] T276 [P] Run accessibility audit with axe-core and fix issues
-- [ ] T277 [P] Optimize frontend bundle size with code splitting
-- [ ] T278 [P] Set up CI/CD workflows in .github/workflows/
-- [ ] T279 [P] Create Docker production configuration
-- [ ] T280 [P] Validate quickstart.md by running full setup
+- [x] T266 [P] Add comprehensive error handling and user-friendly error messages
+- [x] T267 [P] Implement loading states and skeleton screens across all pages
+- [x] T268 [P] Add toast notifications for success/error feedback
+- [x] T269 [P] Optimize database queries with indexes and eager loading
+- [x] T270 [P] Implement Redis caching for frequently accessed data
+- [x] T271 [P] Add rate limiting to API endpoints (60 requests/minute per user)
+- [x] T272 [P] Configure CORS for frontend domain in backend
+- [x] T273 [P] Set up email templates with Laravel Mailables
+- [x] T274 [P] Create database seeders for demo data in backend/database/seeders/
+- [x] T275 [P] Write API documentation with Laravel Scribe or OpenAPI
+- [x] T276 [P] Run accessibility audit with axe-core and fix issues
+- [x] T277 [P] Optimize frontend bundle size with code splitting
+- [x] T278 [P] Set up CI/CD workflows in .github/workflows/
+- [x] T279 [P] Create Docker production configuration
+- [x] T280 [P] Validate quickstart.md by running full setup
 
 ---
 

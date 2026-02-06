@@ -3,9 +3,11 @@
 namespace App\Listeners;
 
 use App\Events\StudentEnrolled;
+use App\Mail\EnrollmentConfirmationMail;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 
 class SendEnrollmentConfirmation implements ShouldQueue
 {
@@ -27,8 +29,7 @@ class SendEnrollmentConfirmation implements ShouldQueue
             'course_title' => $course->title,
         ]);
 
-        // TODO: Send email confirmation to student
-        // Notification::send($student, new EnrollmentConfirmationNotification($enrollment));
+        Mail::to($student)->send(new EnrollmentConfirmationMail($enrollment));
     }
 }
 

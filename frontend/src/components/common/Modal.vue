@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, onUnmounted } from 'vue'
+import { onMounted, onUnmounted, ref, watch, nextTick } from 'vue'
 
 interface Props {
   isOpen: boolean
@@ -15,9 +15,30 @@ const emit = defineEmits<{
   close: []
 }>()
 
-const handleEscape = (event: KeyboardEvent) => {
+const modalRef = ref<HTMLElement | null>(null)
+let previouslyFocused: HTMLElement | null = null
+
+const handleKeydown = (event: KeyboardEvent) => {
   if (event.key === 'Escape' && props.isOpen) {
     emit('close')
+    return
+  }
+
+  // Focus trapping
+  if (event.key === 'Tab' && props.isOpen && modalRef.value) {
+    const focusable = modalRef.value.querySelectorAll<HTMLElement>(
+      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+    )
+    const first = focusable[0]
+    const last = focusable[focusable.length - 1]
+
+    if (event.shiftKey && document.activeElement === first) {
+      event.preventDefault()
+      last?.focus()
+    } else if (!event.shiftKey && document.activeElement === last) {
+      event.preventDefault()
+      first?.focus()
+    }
   }
 }
 
@@ -27,15 +48,31 @@ const handleBackdropClick = (event: MouseEvent) => {
   }
 }
 
+watch(() => props.isOpen, async (isOpen) => {
+  if (isOpen) {
+    previouslyFocused = document.activeElement as HTMLElement
+    document.body.style.overflow = 'hidden'
+    await nextTick()
+    // Focus the first focusable element in the modal
+    const focusable = modalRef.value?.querySelector<HTMLElement>(
+      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+    )
+    focusable?.focus()
+  } else {
+    document.body.style.overflow = ''
+    previouslyFocused?.focus()
+  }
+})
+
 onMounted(() => {
-  document.addEventListener('keydown', handleEscape)
+  document.addEventListener('keydown', handleKeydown)
   if (props.isOpen) {
     document.body.style.overflow = 'hidden'
   }
 })
 
 onUnmounted(() => {
-  document.removeEventListener('keydown', handleEscape)
+  document.removeEventListener('keydown', handleKeydown)
   document.body.style.overflow = ''
 })
 </script>
@@ -51,7 +88,7 @@ onUnmounted(() => {
         :aria-labelledby="title ? 'modal-title' : undefined"
         @click="handleBackdropClick"
       >
-        <div :class="['modal', `modal-${size}`]" @click.stop>
+        <div ref="modalRef" :class="['modal', `modal-${size}`]" @click.stop>
           <div v-if="title" class="modal-header">
             <h2 id="modal-title" class="modal-title">{{ title }}</h2>
             <button

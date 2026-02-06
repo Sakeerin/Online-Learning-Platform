@@ -10,6 +10,11 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 
+/**
+ * @group Authentication
+ *
+ * Endpoints for user login and logout.
+ */
 class LoginController extends Controller
 {
     /**

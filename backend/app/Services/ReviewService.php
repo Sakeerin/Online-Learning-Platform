@@ -22,7 +22,7 @@ class ReviewService
                 ->first();
 
             if (!$enrollment) {
-                throw new \Exception('You must be enrolled in this course to leave a review.');
+                throw new \App\Exceptions\NotEnrolledException();
             }
 
             // Check if review already exists
@@ -31,7 +31,11 @@ class ReviewService
                 ->first();
 
             if ($existingReview) {
-                throw new \Exception('You have already reviewed this course.');
+                throw new \App\Exceptions\ApiException(
+                    message: 'You have already reviewed this course.',
+                    errorCode: 'DUPLICATE_REVIEW',
+                    statusCode: 409
+                );
             }
 
             // Create review
@@ -108,7 +112,7 @@ class ReviewService
     {
         // Verify instructor owns the course
         if ($review->course->instructor_id !== $instructor->id) {
-            throw new \Exception('You are not authorized to respond to this review.');
+            throw new \Illuminate\Auth\Access\AuthorizationException('You are not authorized to respond to this review.');
         }
 
         return DB::transaction(function () use ($review, $response) {
@@ -175,6 +179,8 @@ class ReviewService
             'average_rating' => $stats->average_rating ? round($stats->average_rating, 2) : 0,
             'total_reviews' => $stats->total_reviews ?? 0,
         ]);
+
+        CacheService::invalidateCourseRating($course->id);
     }
 }
 

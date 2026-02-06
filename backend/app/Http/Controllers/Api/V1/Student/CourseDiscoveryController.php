@@ -9,6 +9,11 @@ use App\Services\CourseService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
+/**
+ * @group Course Discovery
+ *
+ * Public endpoints for browsing, searching, and viewing course details.
+ */
 class CourseDiscoveryController extends Controller
 {
     public function __construct(

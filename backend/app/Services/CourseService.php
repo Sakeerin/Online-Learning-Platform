@@ -41,6 +41,7 @@ class CourseService
     {
         return DB::transaction(function () use ($course, $data) {
             $course->update(array_filter($data, fn ($value) => $value !== null));
+            CacheService::invalidateCourse($course->id);
 
             return $course->fresh(['instructor', 'sections.lessons']);
         });
@@ -53,13 +54,15 @@ class CourseService
     {
         return DB::transaction(function () use ($course) {
             if (!$course->canBePublished()) {
-                throw new \Exception('Course cannot be published. It must have at least one section with a video lesson, a thumbnail, and a description of at least 100 characters.');
+                throw new \App\Exceptions\CourseNotPublishableException();
             }
 
             $course->update([
                 'status' => 'published',
                 'published_at' => $course->published_at ?? now(),
             ]);
+
+            CacheService::invalidateCourse($course->id);
 
             return $course->fresh(['instructor', 'sections.lessons']);
         });
@@ -75,6 +78,8 @@ class CourseService
                 'status' => 'unpublished',
             ]);
 
+            CacheService::invalidateCourse($course->id);
+
             return $course->fresh(['instructor', 'sections.lessons']);
         });
     }
@@ -85,7 +90,10 @@ class CourseService
     public function delete(Course $course): bool
     {
         return DB::transaction(function () use ($course) {
-            return $course->delete();
+            $courseId = $course->id;
+            $result = $course->delete();
+            CacheService::invalidateCourse($courseId);
+            return $result;
         });
     }
 
@@ -280,10 +288,12 @@ class CourseService
      */
     public function getPublicCourse(string $courseId): ?Course
     {
-        return Course::where('id', $courseId)
-            ->where('status', 'published')
-            ->with(['instructor', 'sections.lessons']) // T106: Eager load relationships
-            ->first();
+        return Cache::remember("course:public:{$courseId}", CacheService::TTL_MEDIUM, function () use ($courseId) {
+            return Course::where('id', $courseId)
+                ->where('status', 'published')
+                ->with(['instructor', 'sections.lessons'])
+                ->first();
+        });
     }
 }
 

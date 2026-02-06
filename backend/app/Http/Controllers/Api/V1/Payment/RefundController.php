@@ -8,6 +8,12 @@ use App\Services\PaymentService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
+/**
+ * @group Payments
+ * @authenticated
+ *
+ * Endpoints for requesting refunds and checking refund eligibility.
+ */
 class RefundController extends Controller
 {
     public function __construct(

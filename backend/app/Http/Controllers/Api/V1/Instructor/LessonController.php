@@ -13,6 +13,12 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
+/**
+ * @group Instructor - Lessons
+ * @authenticated
+ *
+ * Endpoints for instructors to manage lessons, upload videos, and reorder content.
+ */
 class LessonController extends Controller
 {
     public function __construct(

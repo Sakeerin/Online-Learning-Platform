@@ -11,6 +11,12 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 
+/**
+ * @group Instructor - Sections
+ * @authenticated
+ *
+ * Endpoints for instructors to manage course sections.
+ */
 class SectionController extends Controller
 {
     /**

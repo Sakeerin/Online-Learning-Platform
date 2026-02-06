@@ -9,6 +9,11 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Validation\ValidationException;
 
+/**
+ * @group Authentication
+ *
+ * Endpoints for password reset and recovery.
+ */
 class PasswordResetController extends Controller
 {
     /**

@@ -8,6 +8,7 @@ use App\Models\Lesson;
 use App\Models\Progress;
 use App\Models\Transaction;
 use App\Models\User;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
 class AnalyticsService
@@ -17,10 +18,23 @@ class AnalyticsService
      */
     public function getInstructorAnalytics(User $instructor, array $filters = []): array
     {
+        $cacheKey = "analytics:instructor:{$instructor->id}";
+
+        // Only cache when using default date range (no custom filters)
+        if (empty($filters['date_from']) && empty($filters['date_to'])) {
+            return Cache::remember($cacheKey, CacheService::TTL_SHORT, function () use ($instructor, $filters) {
+                return $this->buildInstructorAnalytics($instructor, $filters);
+            });
+        }
+
+        return $this->buildInstructorAnalytics($instructor, $filters);
+    }
+
+    private function buildInstructorAnalytics(User $instructor, array $filters): array
+    {
         $dateFrom = $filters['date_from'] ?? now()->subDays(30)->startOfDay();
         $dateTo = $filters['date_to'] ?? now()->endOfDay();
 
-        // Get instructor's courses
         $courses = Course::where('instructor_id', $instructor->id)->pluck('id');
 
         return [
@@ -43,7 +57,7 @@ class AnalyticsService
     {
         // Verify instructor owns the course
         if ($course->instructor_id !== $instructor->id) {
-            throw new \Exception('You are not authorized to view analytics for this course.');
+            throw new \Illuminate\Auth\Access\AuthorizationException('You are not authorized to view analytics for this course.');
         }
 
         $dateFrom = $filters['date_from'] ?? now()->subDays(30)->startOfDay();
@@ -74,14 +88,16 @@ class AnalyticsService
             ->with('section')
             ->get();
 
+        // Prefetch all enrollment IDs and progress records to avoid N+1
+        $enrollmentIds = Enrollment::where('course_id', $course->id)->pluck('id');
+        $allProgress = Progress::whereIn('enrollment_id', $enrollmentIds)
+            ->get()
+            ->groupBy('lesson_id');
+
         $analytics = [];
 
         foreach ($lessons as $lesson) {
-            $enrollments = Enrollment::where('course_id', $course->id)->pluck('id');
-            
-            $progressRecords = Progress::whereIn('enrollment_id', $enrollments)
-                ->where('lesson_id', $lesson->id)
-                ->get();
+            $progressRecords = $allProgress->get($lesson->id, collect());
 
             $totalViews = $progressRecords->count();
             $completedCount = $progressRecords->where('is_completed', true)->count();
@@ -336,12 +352,14 @@ class AnalyticsService
 
     private function getRevenueByCourse($transactions): array
     {
+        $courseIds = $transactions->pluck('course_id')->unique();
+        $courses = Course::whereIn('id', $courseIds)->pluck('title', 'id');
+
         return $transactions->groupBy('course_id')
-            ->map(function ($group, $courseId) {
-                $course = Course::find($courseId);
+            ->map(function ($group, $courseId) use ($courses) {
                 return [
                     'course_id' => $courseId,
-                    'course_title' => $course?->title ?? 'Unknown',
+                    'course_title' => $courses[$courseId] ?? 'Unknown',
                     'total_revenue' => (float) $group->sum('instructor_revenue'),
                     'total_amount' => (float) $group->sum('amount'),
                     'platform_fees' => (float) $group->sum('platform_fee'),

@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Mail\TransactionReceiptMail;
 use App\Models\Transaction;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -26,19 +27,13 @@ class SendTransactionReceipt implements ShouldQueue
      */
     public function handle(): void
     {
-        // Send email receipt to user
-        // For now, we'll just log it
-        // In production, create a Mailable class and send email
-        
-        \Log::info('Transaction receipt sent', [
+        \Log::info('Sending transaction receipt', [
             'transaction_id' => $this->transaction->id,
             'user_id' => $this->transaction->user_id,
             'amount' => $this->transaction->amount,
         ]);
 
-        // TODO: Implement email sending
-        // Mail::to($this->transaction->user->email)
-        //     ->send(new TransactionReceipt($this->transaction));
+        Mail::to($this->transaction->user)->send(new TransactionReceiptMail($this->transaction));
     }
 }
 

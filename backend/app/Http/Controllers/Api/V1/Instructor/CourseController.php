@@ -14,6 +14,12 @@ use App\Services\CourseService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
+/**
+ * @group Instructor - Course Management
+ * @authenticated
+ *
+ * Endpoints for instructors to create, update, publish, and manage their courses.
+ */
 class CourseController extends Controller
 {
     public function __construct(

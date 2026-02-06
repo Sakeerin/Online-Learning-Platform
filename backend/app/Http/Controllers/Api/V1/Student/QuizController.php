@@ -13,6 +13,12 @@ use App\Services\QuizService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
+/**
+ * @group Student - Quizzes
+ * @authenticated
+ *
+ * Endpoints for students to take quizzes, submit answers, and view attempt results.
+ */
 class QuizController extends Controller
 {
     public function __construct(

@@ -19,8 +19,11 @@ use App\Models\Review;
 use App\Policies\CoursePolicy;
 use App\Policies\EnrollmentPolicy;
 use App\Policies\ReviewPolicy;
+use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\RateLimiter;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -49,6 +52,7 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         $this->registerPolicies();
+        $this->configureRateLimiting();
 
         // Register event listeners
         Event::listen(
@@ -82,5 +86,24 @@ class AppServiceProvider extends ServiceProvider
             CourseCompleted::class,
             IssueCertificate::class
         );
+    }
+
+    /**
+     * Configure the rate limiters for the application.
+     */
+    protected function configureRateLimiting(): void
+    {
+        RateLimiter::for('api', function (Request $request) {
+            $user = $request->user();
+            return Limit::perMinute(60)->by($user ? $user->id : $request->ip());
+        });
+
+        RateLimiter::for('public', function (Request $request) {
+            return Limit::perMinute(30)->by($request->ip());
+        });
+
+        RateLimiter::for('webhooks', function (Request $request) {
+            return Limit::perMinute(10)->by($request->ip());
+        });
     }
 }

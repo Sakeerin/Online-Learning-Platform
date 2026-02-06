@@ -3,9 +3,11 @@
 namespace App\Listeners;
 
 use App\Events\CoursePublished;
+use App\Mail\CoursePublishedMail;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Notification;
 
 class SendCoursePublishedNotification implements ShouldQueue
@@ -27,8 +29,7 @@ class SendCoursePublishedNotification implements ShouldQueue
             'instructor_email' => $instructor->email,
         ]);
 
-        // TODO: Send email notification to instructor
-        // Notification::send($instructor, new CoursePublishedNotification($course));
+        Mail::to($instructor)->send(new CoursePublishedMail($course));
     }
 }
 

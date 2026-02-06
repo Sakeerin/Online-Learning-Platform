@@ -10,6 +10,11 @@ use Stripe\Exception\SignatureVerificationException;
 use Stripe\Stripe;
 use Stripe\Webhook;
 
+/**
+ * @group Payments
+ *
+ * Stripe webhook handler for processing payment events.
+ */
 class WebhookController extends Controller
 {
     public function __construct(

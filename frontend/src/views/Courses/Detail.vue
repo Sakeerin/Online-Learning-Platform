@@ -7,6 +7,7 @@ import CourseCurriculum from '@/components/course/CourseCurriculum.vue'
 import EnrollmentButton from '@/components/student/EnrollmentButton.vue'
 import ReviewList from '@/components/student/ReviewList.vue'
 import Card from '@/components/common/Card.vue'
+import Skeleton from '@/components/common/Skeleton.vue'
 import { useAuthStore } from '@/stores/auth'
 
 const route = useRoute()
@@ -43,7 +44,35 @@ const ratingDisplay = computed(() => {
 
 <template>
   <div class="course-detail-page">
-    <div v-if="isLoading" class="loading">Loading course...</div>
+    <div v-if="isLoading" class="loading-skeleton">
+      <div class="skeleton-hero">
+        <div class="skeleton-hero-content">
+          <Skeleton variant="text" height="0.875rem" width="100px" />
+          <Skeleton variant="text" height="2.5rem" width="80%" />
+          <Skeleton variant="text" height="1.25rem" width="60%" />
+          <div class="skeleton-meta-group">
+            <Skeleton variant="text" height="1rem" width="200px" />
+            <div class="skeleton-stats">
+              <Skeleton variant="text" height="0.875rem" width="120px" />
+              <Skeleton variant="text" height="0.875rem" width="150px" />
+              <Skeleton variant="text" height="0.875rem" width="80px" />
+            </div>
+          </div>
+        </div>
+        <div class="skeleton-hero-sidebar">
+          <Skeleton height="300px" border-radius="0.5rem" />
+        </div>
+      </div>
+      <div class="skeleton-body">
+        <div class="skeleton-main">
+          <Skeleton height="200px" border-radius="0.5rem" />
+          <Skeleton height="150px" border-radius="0.5rem" />
+        </div>
+        <div class="skeleton-side">
+          <Skeleton height="250px" border-radius="0.5rem" />
+        </div>
+      </div>
+    </div>
     <div v-else-if="error" class="error">{{ error }}</div>
     <div v-else-if="currentCourse" class="container">
       <!-- Hero Section -->
@@ -161,15 +190,77 @@ const ratingDisplay = computed(() => {
   padding: 0 1.5rem;
 }
 
-.loading,
+.loading-skeleton {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+
+.skeleton-hero {
+  display: grid;
+  grid-template-columns: 1fr 400px;
+  gap: 2rem;
+  margin-bottom: 3rem;
+  padding-bottom: 2rem;
+}
+
+.skeleton-hero-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.skeleton-meta-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+}
+
+.skeleton-stats {
+  display: flex;
+  gap: 1.5rem;
+}
+
+.skeleton-hero-sidebar {
+  position: sticky;
+  top: 2rem;
+  height: fit-content;
+}
+
+.skeleton-body {
+  display: grid;
+  grid-template-columns: 1fr 350px;
+  gap: 2rem;
+}
+
+.skeleton-main {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.skeleton-side {
+  position: sticky;
+  top: 2rem;
+  height: fit-content;
+}
+
 .error {
   text-align: center;
   padding: 4rem 2rem;
   font-size: 1.25rem;
+  color: var(--error);
 }
 
-.error {
-  color: var(--error);
+@media (max-width: 1024px) {
+  .skeleton-hero {
+    grid-template-columns: 1fr;
+  }
+
+  .skeleton-body {
+    grid-template-columns: 1fr;
+  }
 }
 
 .course-hero {

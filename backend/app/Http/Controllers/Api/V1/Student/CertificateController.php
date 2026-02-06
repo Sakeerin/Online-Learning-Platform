@@ -10,6 +10,12 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
+/**
+ * @group Student - Certificates
+ * @authenticated
+ *
+ * Endpoints for students to view and download their course completion certificates.
+ */
 class CertificateController extends Controller
 {
     public function __construct(

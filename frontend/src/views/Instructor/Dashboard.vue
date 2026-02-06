@@ -5,6 +5,7 @@ import { useAuth } from '@/composables/useAuth'
 import { useCourses } from '@/composables/useCourses'
 import Card from '@/components/common/Card.vue'
 import Button from '@/components/common/Button.vue'
+import Skeleton from '@/components/common/Skeleton.vue'
 
 const router = useRouter()
 const { user } = useAuth()
@@ -28,7 +29,19 @@ onMounted(async () => {
 
       <div class="dashboard-content">
         <Card title="My Courses" subtitle="Manage your courses">
-          <div v-if="isLoading" class="loading">Loading courses...</div>
+          <div v-if="isLoading" class="loading-skeleton">
+            <div v-for="i in 3" :key="i" class="skeleton-course-item">
+              <Skeleton height="200px" border-radius="8px 8px 0 0" />
+              <div class="skeleton-course-body">
+                <Skeleton variant="text" height="1.25rem" width="80%" />
+                <Skeleton variant="text" height="0.875rem" width="60%" />
+                <div class="skeleton-course-footer">
+                  <Skeleton variant="text" height="0.75rem" width="70px" />
+                  <Skeleton variant="text" height="0.75rem" width="50px" />
+                </div>
+              </div>
+            </div>
+          </div>
           <div v-else-if="courses.length === 0" class="empty-state">
             <p>You haven't created any courses yet.</p>
             <Button @click="router.push({ name: 'create-course' })">Create Your First Course</Button>
@@ -91,7 +104,32 @@ onMounted(async () => {
   gap: 2rem;
 }
 
-.loading,
+.loading-skeleton {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5rem;
+  margin-top: 1rem;
+}
+
+.skeleton-course-item {
+  border: 2px solid var(--border-color);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.skeleton-course-body {
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.skeleton-course-footer {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 0.5rem;
+}
+
 .empty-state {
   text-align: center;
   padding: 2rem;

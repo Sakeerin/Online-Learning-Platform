@@ -30,7 +30,14 @@ const handleClick = () => {
 </script>
 
 <template>
-  <div class="course-card" @click="handleClick">
+  <div
+    class="course-card"
+    tabindex="0"
+    role="link"
+    :aria-label="`${course.title} - ${formattedPrice}`"
+    @click="handleClick"
+    @keydown.enter="handleClick"
+  >
     <div class="course-thumbnail">
       <img v-if="course.thumbnail" :src="course.thumbnail" :alt="course.title" />
       <div v-else class="thumbnail-placeholder">

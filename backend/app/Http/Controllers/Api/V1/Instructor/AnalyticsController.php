@@ -8,6 +8,12 @@ use App\Services\AnalyticsService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
+/**
+ * @group Instructor - Analytics
+ * @authenticated
+ *
+ * Endpoints for instructors to view enrollment, revenue, and course performance analytics.
+ */
 class AnalyticsController extends Controller
 {
     public function __construct(

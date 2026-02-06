@@ -9,6 +9,12 @@ use App\Services\PaymentService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
+/**
+ * @group Payments
+ * @authenticated
+ *
+ * Endpoints for creating checkout sessions and verifying payment status.
+ */
 class CheckoutController extends Controller
 {
     public function __construct(

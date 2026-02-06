@@ -11,6 +11,12 @@ use App\Services\VideoService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
+/**
+ * @group Student - Learning
+ * @authenticated
+ *
+ * Endpoints for students to access course learning content and video playback.
+ */
 class LearningController extends Controller
 {
     public function __construct(
