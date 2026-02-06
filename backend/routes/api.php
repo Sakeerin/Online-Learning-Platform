@@ -102,6 +102,12 @@ Route::middleware(['auth:sanctum'])->prefix('v1')->group(function () {
 
         // Review response routes (instructor can respond to reviews)
         Route::post('courses/{course}/reviews/{review}/respond', [ReviewController::class, 'respond']);
+
+        // Analytics routes
+        Route::get('analytics', [\App\Http\Controllers\Api\V1\Instructor\AnalyticsController::class, 'index']);
+        Route::get('analytics/revenue', [\App\Http\Controllers\Api\V1\Instructor\AnalyticsController::class, 'revenue']);
+        Route::get('courses/{course}/analytics', [\App\Http\Controllers\Api\V1\Instructor\AnalyticsController::class, 'course']);
+        Route::get('courses/{course}/analytics/lessons', [\App\Http\Controllers\Api\V1\Instructor\AnalyticsController::class, 'lessons']);
     });
     
     // Student routes  

@@ -568,27 +568,27 @@
 
 ### Backend Business Logic
 
-- [ ] T254 [US9] Create AnalyticsService with enrollment trends, revenue, engagement in backend/app/Services/AnalyticsService.php
-- [ ] T255 [US9] Implement lesson analytics (completion rates, watch time)
-- [ ] T256 [US9] Calculate instructor revenue and payout schedule
+- [x] T254 [US9] Create AnalyticsService with enrollment trends, revenue, engagement in backend/app/Services/AnalyticsService.php
+- [x] T255 [US9] Implement lesson analytics (completion rates, watch time)
+- [x] T256 [US9] Calculate instructor revenue and payout schedule
 
 ### Backend API Controllers & Routes
 
-- [ ] T257 [US9] Create AnalyticsController in backend/app/Http/Controllers/Api/V1/Instructor/AnalyticsController.php
-- [ ] T258 [US9] Add analytics routes to backend/routes/api.php
+- [x] T257 [US9] Create AnalyticsController in backend/app/Http/Controllers/Api/V1/Instructor/AnalyticsController.php
+- [x] T258 [US9] Add analytics routes to backend/routes/api.php
 
 ### Frontend UI Components & Pages
 
-- [ ] T259 [P] [US9] Create AnalyticsDashboard.vue component in frontend/src/components/instructor/AnalyticsDashboard.vue
-- [ ] T260 [US9] Create Analytics.vue page in frontend/src/views/Instructor/Analytics.vue
-- [ ] T261 [US9] Create Revenue.vue page in frontend/src/views/Instructor/Revenue.vue
-- [ ] T262 [P] [US9] Create analyticsService API client in frontend/src/services/analyticsService.ts
+- [x] T259 [P] [US9] Create AnalyticsDashboard.vue component in frontend/src/components/instructor/AnalyticsDashboard.vue
+- [x] T260 [US9] Create Analytics.vue page in frontend/src/views/Instructor/Analytics.vue
+- [x] T261 [US9] Create Revenue.vue page in frontend/src/views/Instructor/Revenue.vue
+- [x] T262 [P] [US9] Create analyticsService API client in frontend/src/services/analyticsService.ts
 
 ### Analytics Features
 
-- [ ] T263 [US9] Display enrollment trends with charts (Chart.js or similar)
-- [ ] T264 [US9] Show revenue breakdown with platform fees
-- [ ] T265 [US9] Display student demographics and enrollment sources
+- [x] T263 [US9] Display enrollment trends with charts (Chart.js or similar)
+- [x] T264 [US9] Show revenue breakdown with platform fees
+- [x] T265 [US9] Display student demographics and enrollment sources
 
 **Checkpoint**: Instructor Analytics complete - instructors can optimize their courses
 
